@@ -1,0 +1,104 @@
+@font-face {
+    font-family: "FnafFont";          /* name you will use in CSS */
+    src: url("assets/fnafFont.ttf") format("truetype"); /* adjust path */
+    font-weight: normal;
+    font-style: normal;
+}
+button {
+    font-family: "FnafFont", sans-serif;
+    color: white;
+    background-image: url('assets/nightSelectorStatic.gif');
+    font-size: 25px;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.3s ease;
+}
+#menuButtons {
+    position: fixed;
+    top: 75%;
+    left: 75%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+#menuButtons button {
+    font-size: 3vw;
+    width: 25vw;
+    transition: transform 0.2s ease;
+}
+#menuButtons button:hover {
+    transform: scale(1.3);
+}
+#menuButtons button:active {
+    transform: scale(0.8);
+}
+#credits {
+    position: fixed;
+    font-family: "FnafFont";
+    background-image: url('assets/nightSelectorStatic.gif');
+    padding: 20px 20px;
+    color: rgb(255, 255, 255);
+    left: 50%;
+    top: -500px;
+    transform: translate(-50%,-50%);
+    transition: top 1s cubic-bezier(0.1,1,0.1,1);
+    text-align: center;
+}
+#credits.active {
+    top: 50%
+}
+#credits.close {
+    top: -500px;
+}
+#settings {
+    position: fixed;
+    font-family: "FnafFont";
+    background-image: url('assets/nightSelectorStatic.gif');
+    padding: 20px 20px;
+    color: rgb(255, 255, 255);
+    left: 50%;
+    top: -500px;
+    transform: translate(-50%,-50%);
+    transition: top 1s cubic-bezier(0.1,1,0.1,1);
+    text-align: center;
+}
+#settings.active {
+    top: 50%
+}
+#settings.close {
+    top: -500px;
+}
+#nightSelector {
+    position: fixed;
+    top: 0px;
+    height: 100%;
+    background-image: url('assets/nightSelectorStatic.gif');
+    padding: 20px 20px;
+    left: -500px;
+    color: black;
+    transition: left 1s cubic-bezier(0.1,1,0.1,1);
+    text-align: center;
+    gap: 5px;
+}
+
+#nightSelector button {
+    display: block;
+    font-size: 2vw;
+}
+#nightSelector.active {
+    left: 0px; /* Falls to this position */
+}
+#nightSelector.close {
+    left: -500px; /* Moves back above the screen */
+}
+#gameCanvas {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Ensure it's behind other elements */
+    background-color: white;
+}

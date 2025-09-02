@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Five Nights at Beems 2</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="titleScreen">
+        <div id="menuButtons">
+            <button id="nightsButton" onclick="nightSelectorOpen()">Nights</button>
+            <button id="settingsButton" onclick="settingsOpen()">Settings</button>
+            <button id="creditsButton" onclick="creditsOpen()">Credits</button>
+        </div>
+        <div id="settings">
+            Speedhack
+            <div id="speedhackDisplay">1.0x</div>
+            <input id="speedhackSlider" type="range" min="5" max="30" value="10">
+        </div>
+        <div id="credits">
+            <h1>Credits</h1>
+            <h2>Bubzeee: Photoshop artist</h2>
+            <h2>Lucsaani: Making music</h2>
+            <h2>Walrusr: Too much aura</h2>
+            <h2>Wistfully: brilliant idea</h2>
+            <br>
+            <h1>Inspiration:</h1>
+            <h2>One More Night</h2>
+            <h2>Five Nights at The Gangs</h2>
+        </div>
+        <div id="nightSelector">
+            <button id="night1" onclick="selectNight(1)">Night 1</button>
+            <button id="night2" onclick="selectNight(2)">Night 2</button>
+            <button id="night3" onclick="selectNight(3)">Night 3</button>
+            <button id="night4" onclick="selectNight(4)">Night 4</button>
+            <button id="night5" onclick="selectNight(5)">Night 5</button>
+        </div>
+    </div>
+    <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+    <script src="script.js"></script>
+</body>
+</html>
