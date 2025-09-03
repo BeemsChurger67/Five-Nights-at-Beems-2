@@ -10,12 +10,14 @@ let flashlightSound = new Audio('assets/flashlightSound.mp3');
 let buzzSound = new Audio('assets/buzzSound.mp3');
 let thankYouKindSir = new Audio('assets/thankyou.mp3');
 let bubzeeeLocate = new Audio('assets/bubzeeLocate.wav');
+let localDeath = new Audio('assets/localJumpscare.mp3');
+let localGlitching = new Audio('assets/glitching.mp3');
 
 let night1Line = new Audio('assets/night1Line.mp3');
 let night2Line = new Audio('assets/night2Line.mp3');
 let night3Line = new Audio('assets/night3Line.mp3');
 let night4Line = new Audio('assets/night4Line.mp3');
-//let night5Line = new Audio('assets/night3Line.mp3');
+//let night5Line = new Audio('assets/night5Line.mp3');
 
 let office = new Image();
 office.src = 'assets/office.png';
@@ -68,11 +70,13 @@ bryanDeath.src = "assets/nerdcat.jpg"
 let janeCharacter = new Image();
 janeCharacter.src = "assets/janebreak.png"
 let bubzeeeCharacter = new Image();
-bubzeeeCharacter.src = "assets/bubzeee.png"
+bubzeeeCharacter.src = "assets/baldzeee.png"
 let bubzeeeWig = new Image();
 bubzeeeWig.src = "assets/bubzeeeWig.png"
 let zennixCharacter = new Image();
 zennixCharacter.src = "assets/meowsicle.png"
+let localCharacter = new Image();
+localCharacter.src = "assets/yourLocalGamer.png"
 let noahCharacter = new Image();
 noahCharacter.src = "assets/darkbatman.jpg"
 let camImgs = [cam0,cam1,cam2,cam3,cam4,cam5,cam6];
@@ -87,6 +91,7 @@ let mouse = {x: 0, y: 0};
 let inCamera = false;
 let keys = {};
 let singleTapKeys = {}
+let singleTapS = false;
 let speedhack = 1;
 let mask = false;
 let maskAnimationFrame = 0;
@@ -109,6 +114,7 @@ let frameClick = false;
 let night = 0;
 let FPS = 120;
 let nightLineTimer = [7*FPS, false];
+let lineSkipTimer = [15*FPS, false];
 let nightLines = [night1Line, night2Line, night3Line];
 let whichCharacterReset = 0;
 let characters = [ // 44 opacity
@@ -118,7 +124,7 @@ let characters = [ // 44 opacity
     ["jane", Math.random() * 20*FPS + 20*FPS, 2*FPS, 1, 0.5*FPS],
     ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 2 + 2),false], // wigCam | wigTaken
     ["zennix", 0, 0, 1, 999999*FPS],
-    ["local", 0, 0, 1, 999999*FPS],
+    ["local", 0, 1.5*FPS, 1, 0, false], // active | 
     ["noah", Math.random() * 30*FPS + 30*FPS,8*FPS,1,1*FPS,401,false], // x | side
 
 ] // character | spawnTimer | killTimer | difficulty | leaveTimer | extra 1 | extra 2...
@@ -252,6 +258,7 @@ function selectNight(nightSelected) {
     deathState = false;
     deathAnimationTimer = 0;
     nightLineTimer = [7*FPS, false];
+    lineSkipTimer = [15*FPS, false];
     gameInterval = setInterval(updateGame, 1000/FPS);
 }
 function collide(x1, y1, w1, h1, x2, y2, w2, h2) {
@@ -308,6 +315,7 @@ function updateGame() {
                 cameraAnimationFrame[0] = 0;
                 powerConsumers[2] = !powerConsumers[2];
                 mask = false;
+                singleTapS = true;
             }
             if (singleTapKeys["KeyF"]) {
                 powerConsumers[3] = !powerConsumers[3];
@@ -523,6 +531,36 @@ function updateGame() {
                     }
                 }
             }
+            if (ingameCharacters[i][0] == "local") {
+                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                if (ingameCharacters[i][1] < 0) {
+                    if (singleTapS && !powerConsumers[2]) {
+                        if (Math.random() * 10 > 8 / ingameCharacters[i][3]) {
+                            ingameCharacters[i][4] = true;
+                        }
+                    }
+                    if (ingameCharacters[i][4]) {
+                        ctx.drawImage(localCharacter,-cameraX/3 + canvas.width/2+400, canvas.height/2+130, 300, 400);
+                        ingameCharacters[i][2]--;
+                        localGlitching.play();
+                    }
+                    if (mask) {
+                        localGlitching.currentTime = 0;
+                        localGlitching.pause();
+                        ingameCharacters[i][2] = 1.5*FPS;
+                        ingameCharacters[i][4] = false;
+                    }
+                    if (powerConsumers[2] && ingameCharacters[i][4]) {
+                        ingameCharacters[i][2] = -1;
+                    }
+                    if(ingameCharacters[i][2] < 0) {
+                        localGlitching.currentTime = 0;
+                        localGlitching.pause();
+                        deathState = true;
+                        deathBy = ingameCharacters[i][0];
+                    }
+                }
+            }
             if (ingameCharacters[i][0] == "noah") {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
@@ -554,7 +592,7 @@ function updateGame() {
         }
     }
     if (!powerConsumers[2]) {
-        ctx.drawImage(fog1,0, 0, canvas.width, canvas.height)
+        ctx.drawImage(fog1,0, 0, canvas.width, canvas.height);
     }
     if (powerConsumers[3]) {ctx.drawImage(flashlightGlow,cameraX-250,cameraY-250,500,500);}
     ctx.drawImage(maskImg,0,-1080 + maskAnimationFrame*(1080/15),1920,1080);
@@ -594,13 +632,31 @@ function updateGame() {
     nightLineTimer[0]--;
     if (nightLineTimer[0] < 0 && !nightLineTimer[1]) {
         nightLineTimer[1] = true;
-        nightLines[night-1].play();
+        if (!lineSkipTimer[1]) {
+            nightLines[night-1].play();
+        }
+    }
+    if (lineSkipTimer[0] > 0) {
+        ctx.fillStyle = "black"
+        ctx.fillRect(30,12,180,30)
+        ctx.fillStyle = "white";
+        ctx.font = "bold 30px FnafFont";
+        ctx.fillText("SKIP CALL", 30, 60);
+        if (collide(mouse.x,mouse.y,1,1,30,12,180,30) && frameClick) {
+            lineSkipTimer = 0;
+            for (let i = 0; i<nightLines.length; i++) {
+                nightLines[i].currentTime = 0;
+                nightLines[i].pause();
+            }
+            nightLineTimer[1] = true;
+        }
+        lineSkipTimer[0]--;
     }
     ctx.fillStyle = "white";
     ctx.font = "bold 75px FnafFont";
     ctx.fillText(`Power: ${power.toFixed(1)}%`, 30, 1000);
     ctx.fillText(`${Math.round((nightTimer[0]/nightTimer[1]*6)-0.5)}AM`, 30, 1100);
-
+    
     frameClick = false;
     if (nightTimer[0] >= nightTimer[1]) {
         winState = true;
@@ -685,9 +741,19 @@ function updateGame() {
                 ctx.drawImage(noahCharacter,0,0,canvas.width,canvas.height);
             }
         }
+        if(deathBy == "local") {
+            deathAnimationTimer++;
+            if (deathAnimationTimer >= 3*60) { 
+                backMainMenu();
+            } else {
+                localDeath.play();
+                ctx.drawImage(localCharacter,0,0,canvas.width,canvas.height);
+            }
+        }
     }
     for (let key in singleTapKeys) {
         singleTapKeys[key] = false;
     }
+    singleTapS = false;
 }
 menuInterval = setInterval(updateMenu, 1000/FPS);
