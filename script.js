@@ -100,10 +100,10 @@ let night = 0;
 let FPS = 120;
 let whichCharacterReset = 0;
 let characters = [ // 44 opacity
-    ["beems", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1],
-    ["jolly beems", Math.random() * 10*FPS + 20*FPS, 10*FPS, 1],
+    ["beems", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, 0.5*FPS],
+    ["jolly beems", Math.random() * 10*FPS + 20*FPS, 10*FPS, 1, 0.5*FPS],
     ["bryan", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, 1*FPS],
-    ["jane", Math.random() * 20*FPS + 20*FPS, 2*FPS, 1, 1*FPS/2],
+    ["jane", Math.random() * 20*FPS + 20*FPS, 2*FPS, 1, 0.5*FPS],
     ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 3 + 3),false], // wigCam | wigTaken
     ["zennix", Math.random() * 120*FPS + 50*FPS, ,10*FPS, 1*FPS]
 ] // character | spawnTimer | killTimer | difficulty | leaveTimer | extra 1 | extra 2...
@@ -213,7 +213,7 @@ function selectNight(nightSelected) {
     clearInterval(menuInterval);
     inGame = true;
     power = 100;
-    nightTimer = [0,270*FPS];
+    nightTimer = [0,7*FPS];
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
@@ -272,7 +272,7 @@ function backMainMenu() {
 }
 function updateGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!winState || !deathState) {
+    if (!winState && !deathState) {
         if (power > 0) {
             if (singleTapKeys["KeyA"]) {
                 powerConsumers[0] = !powerConsumers[0];
@@ -361,16 +361,20 @@ function updateGame() {
             drawCam(1660,755,6);
         }
     }
-    if (!deathState) {
+    if (!deathState && !winState) {
         for (let i = 0; i<ingameCharacters.length; i++) {
             if (ingameCharacters[i][0] == "beems") {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
+                    if (!powerConsumers[2] || !powerConsumers[0]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
                     if (powerConsumers[0]) {
+                        ingameCharacters[i][4]--;
+                    }
+                    if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
+                        ingameCharacters[i][4] = 0.5*FPS;
                         beemsLeave.pause(); 
                         beemsLeave.currentTime = 0;
                         beemsLeave.play();
@@ -491,7 +495,7 @@ function updateGame() {
                     }
                     if(ingameCharacters[i][2] < 0) {
                         deathState = true;
-                        deathBy = ingameCharacters[i][0]
+                        deathBy = ingameCharacters[i][0];
                     }
                 }
             }
@@ -505,7 +509,7 @@ function updateGame() {
     if (power <= 0) {
         ctx.drawImage(powerOutageDarkness,0,0,canvas.width,canvas.height);
     }
-    if (!winState || !deathState) {
+    if (!winState && !deathState) {
         blackBgTransparency[1]++;
         if (blackBgTransparency[1] > 3) {
             if (blackBgTransparency[0] > 0.01) {
@@ -559,7 +563,7 @@ function updateGame() {
         ctx.fillStyle = "white";
         ctx.fillText('6AM', canvas.width/2-200, canvas.height/1.5);
         titleTime++;
-        if (titleTime >= 2050) {
+        if (titleTime >= 8*FPS) {
             menuInterval = setInterval(updateMenu, 1000/FPS);
             clearInterval(gameInterval);
             document.getElementById('gameCanvas').style.display = 'none';
