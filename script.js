@@ -64,6 +64,8 @@ let bubzeeeCharacter = new Image();
 bubzeeeCharacter.src = "assets/bubzeee.png"
 let bubzeeeWig = new Image();
 bubzeeeWig.src = "assets/bubzeeeWig.png"
+let zennixCharacter = new Image();
+zennixCharacter.src = "assets/meowsicle.png"
 let camImgs = [cam0,cam1,cam2,cam3,cam4,cam5,cam6];
 let staticDelay = Math.random() * 600+100;
 let staticLength = 60;
@@ -82,7 +84,6 @@ let maskAnimationFrame = 0;
 let power = 100;
 let powerOutState = false;
 let nightTimer = [0,60*240];
-let powerConsume = []
 let powerConsumers = [false,false,false,false] // left door | right door | cams | flashlight
 let winState = false;
 let deathState = false;
@@ -104,18 +105,20 @@ let characters = [ // 44 opacity
     ["jolly beems", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, 0.5*FPS],
     ["bryan", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, 1*FPS],
     ["jane", Math.random() * 20*FPS + 20*FPS, 2*FPS, 1, 0.5*FPS],
-    ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 3 + 3),false], // wigCam | wigTaken
-    ["zennix", 0,10*FPS, 1*FPS]
+    ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 2 + 2),false], // wigCam | wigTaken
+    ["zennix", 0, 0, 1, 999999*FPS],
+    ["fart", 0, 0, 1, 999999*FPS],
+
 ] // character | spawnTimer | killTimer | difficulty | leaveTimer | extra 1 | extra 2...
 let ingameCharacters = [];
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const eachNightDifficulty = [
     [1.0, 1.0],
-    [1.4, 1.4, 5.0, 1.0],
+    [1.4, 1.4, 1.0, 1.0],
     [1.8, 1.8, 1.4, 1.4, 1.0, 1.0],
-    [2.2, 2.2, 1.8, 1.8, 1.4, 1.4],
-    [3, 3, 2.5, 2.5, 2.25, 2.25],
+    [2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0],
+    [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 1.0, 1.0],
 ]
 document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
 document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
@@ -436,7 +439,7 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ((ingameCharacters[i][3] / 5)+1);
-                    if (!powerConsumers[2]) {ctx.drawImage(janeCharacter,-cameraX/3 + canvas.width/2-275/2, 500, 250, 350)}
+                    if (!powerConsumers[2]) {ctx.drawImage(janeCharacter,-cameraX/3 + 2560/2-250/2, 500, 250, 350)}
                     buzzSound.play();
                     if (mask) {
                         ingameCharacters[i][4]--;
@@ -463,7 +466,7 @@ function updateGame() {
             if (ingameCharacters[i][0] == "bubzeee") {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
-                    ingameCharacters[i][2]-= 1 * ((ingameCharacters[i][3] / 5)+1);
+                    ingameCharacters[i][2]-= 1;
                     bubzeeeLocate.play();
                     if (!powerConsumers[2]) {ctx.drawImage(bubzeeeCharacter,-cameraX/3 + 800, 488, 300, 400)}
                     if (powerConsumers[2] && cam == ingameCharacters[i][4] && cameraAnimationFrame[0] > 25) {
@@ -478,10 +481,29 @@ function updateGame() {
                         thankYouKindSir.play();
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
-                        ingameCharacters[i][4] = Math.round(Math.random() * 3 + 3);
+                        ingameCharacters[i][4] = Math.round(Math.random() * 2 + 2)
                         ingameCharacters[i][5] = false;
                     }
                     if(ingameCharacters[i][2] < 0) {
+                        deathState = true;
+                        deathBy = ingameCharacters[i][0]
+                    }
+                }
+            }
+            if (ingameCharacters[i][0] == "zennix") {
+                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                if (ingameCharacters[i][1] < 0) {
+                    ingameCharacters[i][2] += (1 + ingameCharacters[i][3]/5)/8;
+                    if (powerConsumers[2] && cam == 5 && cameraAnimationFrame[0] > 25) {
+                        ctx.drawImage(zennixCharacter, canvas.width / 2 - 100 - ingameCharacters[i][2]/2,canvas.height / 2 - 250 - ingameCharacters[i][2]/2+125, 250+ingameCharacters[i][2],250+ingameCharacters[i][2]);
+                        if (powerConsumers[3] && ingameCharacters[i][2] > 0) {
+                            ingameCharacters[i][2] -= 1 * ((ingameCharacters[i][3] / 5)+1) * 5
+                        }
+                    }
+                    
+                    if(ingameCharacters[i][2] > 7*FPS) {
+                        buzzSound.currentTime = 0;
+                        buzzSound.pause();
                         deathState = true;
                         deathBy = ingameCharacters[i][0]
                     }
@@ -573,7 +595,7 @@ function updateGame() {
             if (deathAnimationTimer >= 3*60) { 
                 backMainMenu();
             } else {
-                ctx.drawImage(jollyBeemsCharacter,0,0,canvas.width,canvas.height)
+                ctx.drawImage(jollyBeemsCharacter,0,0,canvas.width,canvas.height);
             }
         }
         if(deathBy == "bryan") {
@@ -581,7 +603,7 @@ function updateGame() {
             if (deathAnimationTimer >= 3*60) { 
                 backMainMenu();
             } else {
-                ctx.drawImage(bryanDeath,0,0,canvas.width,canvas.height)
+                ctx.drawImage(bryanDeath,0,0,canvas.width,canvas.height);
             }
         }
         if(deathBy == "jane") {
@@ -589,7 +611,7 @@ function updateGame() {
             if (deathAnimationTimer >= 3*60) { 
                 backMainMenu();
             } else {
-                ctx.drawImage(janeCharacter,0,0,canvas.width,canvas.height)
+                ctx.drawImage(janeCharacter,0,0,canvas.width,canvas.height);
             }
         }
         if(deathBy == "bubzeee") {
@@ -597,7 +619,15 @@ function updateGame() {
             if (deathAnimationTimer >= 3*60) { 
                 backMainMenu();
             } else {
-                ctx.drawImage(janeCharacter,0,0,canvas.width,canvas.height)
+                ctx.drawImage(janeCharacter,0,0,canvas.width,canvas.height);
+            }
+        }
+        if(deathBy == "zennix") {
+            deathAnimationTimer++;
+            if (deathAnimationTimer >= 3*60) { 
+                backMainMenu();
+            } else {
+                ctx.drawImage(zennixCharacter,0,0,canvas.width,canvas.height);
             }
         }
     }
