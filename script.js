@@ -101,18 +101,18 @@ let FPS = 120;
 let whichCharacterReset = 0;
 let characters = [ // 44 opacity
     ["beems", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, 0.5*FPS],
-    ["jolly beems", Math.random() * 10*FPS + 20*FPS, 10*FPS, 1, 0.5*FPS],
+    ["jolly beems", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, 0.5*FPS],
     ["bryan", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, 1*FPS],
     ["jane", Math.random() * 20*FPS + 20*FPS, 2*FPS, 1, 0.5*FPS],
     ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 3 + 3),false], // wigCam | wigTaken
-    ["zennix", Math.random() * 120*FPS + 50*FPS, ,10*FPS, 1*FPS]
+    ["zennix", 0,10*FPS, 1*FPS]
 ] // character | spawnTimer | killTimer | difficulty | leaveTimer | extra 1 | extra 2...
 let ingameCharacters = [];
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const eachNightDifficulty = [
     [1.0, 1.0],
-    [1.4, 1.4, 1.0, 1.0],
+    [1.4, 1.4, 5.0, 1.0],
     [1.8, 1.8, 1.4, 1.4, 1.0, 1.0],
     [2.2, 2.2, 1.8, 1.8, 1.4, 1.4],
     [3, 3, 2.5, 2.5, 2.25, 2.25],
@@ -274,17 +274,19 @@ function updateGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!winState && !deathState) {
         if (power > 0) {
-            if (singleTapKeys["KeyA"]) {
-                powerConsumers[0] = !powerConsumers[0];
-                doorSound.pause(); 
-                doorSound.currentTime = 0;
-                doorSound.play();  
-            }
-            if (singleTapKeys["KeyD"]) {
-                powerConsumers[1] = !powerConsumers[1];
-                doorSound.pause(); 
-                doorSound.currentTime = 0;
-                doorSound.play();
+            if (!powerConsumers[2]) {
+                if (singleTapKeys["KeyA"]) {
+                    powerConsumers[0] = !powerConsumers[0];
+                    doorSound.pause(); 
+                    doorSound.currentTime = 0;
+                    doorSound.play();  
+                }
+                if (singleTapKeys["KeyD"]) {
+                    powerConsumers[1] = !powerConsumers[1];
+                    doorSound.pause(); 
+                    doorSound.currentTime = 0;
+                    doorSound.play();
+                }
             }
             if (singleTapKeys["KeyS"]) {
                 cameraAnimationFrame[0] = 0;
@@ -367,7 +369,7 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2] || !powerConsumers[0]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
+                    if (!powerConsumers[2] && !powerConsumers[0]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
                     if (powerConsumers[0]) {
                         ingameCharacters[i][4]--;
                     }
@@ -381,7 +383,7 @@ function updateGame() {
                     }
                     if(ingameCharacters[i][2] < 0) {
                         deathState = true;
-                        deathBy = ingameCharacters[i][0]
+                        deathBy = ingameCharacters[i][0];
                     }
                 }
             }
@@ -389,10 +391,14 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(jollyBeemsCharacter,-cameraX/3 + 1920, 488, 200, 400)}
+                    if (!powerConsumers[2] && !powerConsumers[1]) {ctx.drawImage(jollyBeemsCharacter,-cameraX/3 + 1920, 488, 200, 400)}
                     if (powerConsumers[1]) {
+                        ingameCharacters[i][4]--;
+                    }
+                    if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
+                        ingameCharacters[i][4] = 0.5*FPS;
                         beemsLeave.pause(); 
                         beemsLeave.currentTime = 0;
                         beemsLeave.play();
@@ -407,8 +413,8 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2-135/2, 527, 135, 200)}
-                    if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2-135/2, 527, mouse.x, mouse.y) < 200) {
+                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 527, 135, 200)}
+                    if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2, 527, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 1 * ingameCharacters[i][3];
                     }
@@ -430,7 +436,7 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ((ingameCharacters[i][3] / 5)+1);
-                    if (!powerConsumers[2]) {ctx.drawImage(janeCharacter,-cameraX/3 + canvas.width/2-275/2, 550, 250, 350)}
+                    if (!powerConsumers[2]) {ctx.drawImage(janeCharacter,-cameraX/3 + canvas.width/2-275/2, 500, 250, 350)}
                     buzzSound.play();
                     if (mask) {
                         ingameCharacters[i][4]--;
@@ -478,24 +484,6 @@ function updateGame() {
                     if(ingameCharacters[i][2] < 0) {
                         deathState = true;
                         deathBy = ingameCharacters[i][0]
-                    }
-                }
-            }
-            if (ingameCharacters[i][0] == "beems") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
-                if (ingameCharacters[i][1] < 0) {
-                    ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
-                    if (powerConsumers[0]) {
-                        ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
-                        ingameCharacters[i][2] = 10*FPS;
-                        beemsLeave.pause(); 
-                        beemsLeave.currentTime = 0;
-                        beemsLeave.play();
-                    }
-                    if(ingameCharacters[i][2] < 0) {
-                        deathState = true;
-                        deathBy = ingameCharacters[i][0];
                     }
                 }
             }
