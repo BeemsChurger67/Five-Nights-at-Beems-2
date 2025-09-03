@@ -213,7 +213,7 @@ function selectNight(nightSelected) {
     clearInterval(menuInterval);
     inGame = true;
     power = 100;
-    nightTimer = [0,7*FPS];
+    nightTimer = [0,270*FPS];
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
