@@ -8,6 +8,8 @@ let bellSound = new Audio('assets/bell.mp3');
 let maskSound = new Audio('assets/maskSound.mp3');
 let flashlightSound = new Audio('assets/flashlightSound.mp3');
 let buzzSound = new Audio('assets/buzzSound.mp3');
+let thankYouKindSir = new Audio('assets/thankyou.mp3');
+let bubzeeeLocate = new Audio('assets/bubzeeLocate.wav');
 let office = new Image();
 office.src = 'assets/office.png';
 let leftDoorClosed = new Image();
@@ -60,6 +62,8 @@ let janeCharacter = new Image();
 janeCharacter.src = "assets/janebreak.png"
 let bubzeeeCharacter = new Image();
 bubzeeeCharacter.src = "assets/bubzeee.png"
+let bubzeeeWig = new Image();
+bubzeeeWig.src = "assets/bubzeeeWig.png"
 let camImgs = [cam0,cam1,cam2,cam3,cam4,cam5,cam6];
 let staticDelay = Math.random() * 600+100;
 let staticLength = 60;
@@ -100,19 +104,18 @@ let characters = [ // 44 opacity
     ["jolly beems", Math.random() * 10*FPS + 20*FPS, 10*FPS, 1],
     ["bryan", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, 1*FPS],
     ["jane", Math.random() * 20*FPS + 20*FPS, 2*FPS, 1, 1*FPS/2],
-    ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1],
+    ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 3 + 3),false], // wigCam | wigTaken
     ["zennix", Math.random() * 120*FPS + 50*FPS, ,10*FPS, 1*FPS]
-] // character | spawnTimer | killTimer | difficulty | leaveTimer | extra 2 | extra 3...
+] // character | spawnTimer | killTimer | difficulty | leaveTimer | extra 1 | extra 2...
 let ingameCharacters = [];
-let testTimer = 0;
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const eachNightDifficulty = [
     [1.0, 1.0],
     [1.4, 1.4, 1.0, 1.0],
-    [1.8, 1.8, 1.4, 1.4, 1.0],
-    [2.2, 2.2, 1.8, 1.8, 1.4],
-    [3, 3, 2.5, 2.5, 2.25],
+    [1.8, 1.8, 1.4, 1.4, 1.0, 1.0],
+    [2.2, 2.2, 1.8, 1.8, 1.4, 1.4],
+    [3, 3, 2.5, 2.5, 2.25, 2.25],
 ]
 document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
 document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
@@ -364,7 +367,6 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    console.log(ingameCharacters[i][2])
                     if (!powerConsumers[2]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
                     if (powerConsumers[0]) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
@@ -451,9 +453,35 @@ function updateGame() {
             if (ingameCharacters[i][0] == "bubzeee") {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
+                    ingameCharacters[i][2]-= 1 * ((ingameCharacters[i][3] / 5)+1);
+                    bubzeeeLocate.play();
+                    if (!powerConsumers[2]) {ctx.drawImage(bubzeeeCharacter,-cameraX/3 + 800, 488, 300, 400)}
+                    if (powerConsumers[2] && cam == ingameCharacters[i][4] && cameraAnimationFrame[0] > 25) {
+                        ctx.drawImage(bubzeeeWig,canvas.width/2-250, canvas.height/2-250, 500, 500);
+                        if (collide(mouse.x,mouse.y,1,1,canvas.width/2-250, canvas.height/2-250, 500, 500) && frameClick) {
+                            ingameCharacters[i][5] = true;
+                        }
+                    }
+                    if (ingameCharacters[i][5]) {
+                        bubzeeeLocate.pause();
+                        bubzeeeLocate.currentTime = 0;
+                        thankYouKindSir.play();
+                        ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
+                        ingameCharacters[i][2] = 10*FPS;
+                        ingameCharacters[i][4] = Math.round(Math.random() * 3 + 3);
+                        ingameCharacters[i][5] = false;
+                    }
+                    if(ingameCharacters[i][2] < 0) {
+                        deathState = true;
+                        deathBy = ingameCharacters[i][0]
+                    }
+                }
+            }
+            if (ingameCharacters[i][0] == "beems") {
+                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    console.log(ingameCharacters[i][2])
-                    if (!powerConsumers[2]) {ctx.drawImage(bubzeeeCharacter,-cameraX/3 + 430, 488, 200, 400)}
+                    if (!powerConsumers[2]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
                     if (powerConsumers[0]) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
@@ -507,10 +535,11 @@ function updateGame() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1.0;
     }
-    ctx.fillStyle = "white"
-    ctx.font = "bold 75px FnafFont"
+    ctx.fillStyle = "white";
+    ctx.font = "bold 75px FnafFont";
     ctx.fillText(`Power: ${power.toFixed(1)}%`, 30, 1000);
     ctx.fillText(`${Math.round((nightTimer[0]/nightTimer[1]*6)-0.5)}AM`, 30, 1100);
+
     frameClick = false;
     if (nightTimer[0] >= nightTimer[1]) {
         winState = true;
@@ -564,6 +593,14 @@ function updateGame() {
             }
         }
         if(deathBy == "jane") {
+            deathAnimationTimer++;
+            if (deathAnimationTimer >= 3*60) { 
+                backMainMenu();
+            } else {
+                ctx.drawImage(janeCharacter,0,0,canvas.width,canvas.height)
+            }
+        }
+        if(deathBy == "bubzeee") {
             deathAnimationTimer++;
             if (deathAnimationTimer >= 3*60) { 
                 backMainMenu();
