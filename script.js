@@ -407,8 +407,8 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + screen.width/2-135/2, 527, 135, 200)}
-                    if (powerConsumers[3] && distance(-cameraX/3 + screen.width/2-135/2, 527, mouse.x, mouse.y) < 200) {
+                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2-135/2, 527, 135, 200)}
+                    if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2-135/2, 527, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 1 * ingameCharacters[i][3];
                     }
@@ -430,7 +430,7 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ((ingameCharacters[i][3] / 5)+1);
-                    if (!powerConsumers[2]) {ctx.drawImage(janeCharacter,-cameraX/3 + screen.width/2-275/2, 550, 250, 350)}
+                    if (!powerConsumers[2]) {ctx.drawImage(janeCharacter,-cameraX/3 + canvas.width/2-275/2, 550, 250, 350)}
                     buzzSound.play();
                     if (mask) {
                         ingameCharacters[i][4]--;
