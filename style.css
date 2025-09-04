@@ -4,6 +4,12 @@
     font-weight: normal;
     font-style: normal;
 }
+@font-face {
+    font-family: "intenseFont";
+    src: url("assets/intenseFont.otf") format("opentype");
+    font-weight: bold;
+    font-style: normal; 
+}
 button {
     font-family: "FnafFont", sans-serif;
     color: white;
@@ -91,6 +97,24 @@ button {
 }
 #nightSelector.close {
     left: -500px; /* Moves back above the screen */
+}
+#night6 {
+    color: red;
+}
+#beematron {
+    font-family: "intenseFont", sans-serif;
+    color: red;
+    transition: ease 0.3s;
+}
+#beematron:hover {
+    background-image: url("assets/redStatic.gif");
+    color: white;
+}
+#cheatButton {
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    font-size: 6px;
 }
 #gameCanvas {
     display: none;

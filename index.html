@@ -8,13 +8,14 @@
 </head>
 <body>
     <div id="titleScreen">
+        <button id="cheatButton">cheats</button>
         <div id="menuButtons">
             <button id="nightsButton" onclick="nightSelectorOpen()">Nights</button>
             <button id="settingsButton" onclick="settingsOpen()">Settings</button>
             <button id="creditsButton" onclick="creditsOpen()">Credits</button>
         </div>
         <div id="settings">
-            Speedhack
+            Speedhack (not implemented yet)
             <div id="speedhackDisplay">1.0x</div>
             <input id="speedhackSlider" type="range" min="5" max="30" value="10">
         </div>
@@ -36,6 +37,8 @@
             <button id="night3" onclick="selectNight(3)">Night 3</button>
             <button id="night4" onclick="selectNight(4)">Night 4</button>
             <button id="night5" onclick="selectNight(5)">Night 5</button>
+            <button id="night6" onclick="selectNight(6)">Night 6</button>
+            <button id="beematron" style="font-size: 2.3vw;" onclick="selectNight(7)">BEEMATRON</button>
         </div>
     </div>
     <canvas id="gameCanvas" width="1920" height="1080"></canvas>
