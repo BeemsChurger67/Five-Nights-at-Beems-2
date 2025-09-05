@@ -129,6 +129,7 @@ let lineSkipTimer = [15*FPS, false];
 let nightLines = [night1Line, night2Line, night3Line];
 let whichCharacterReset = 0;
 let deathFrame = false;
+let nightVisuals = 0;
 let characters = [ // 44 opacity
     ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
     ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
@@ -265,6 +266,7 @@ function selectNight(nightSelected) {
     night = nightSelected;
     ingameCharacters.splice(0,ingameCharacters.length);
     deathFrame = false;
+    nightVisuals = 0;
     if (night > 5) {
         for (let i = 0; i < 10; i++) {
             let char = [...characters[i]]; 
@@ -323,6 +325,7 @@ function resetSounds() {
         nightLines[i].currentTime = 0;
         nightLines[i].pause();
     }
+    buzzSound.currentTime = 0; buzzSound.pause();
     staticSound.currentTime = 0; staticSound.pause();
     localGlitching.currentTime = 0; localGlitching.pause();
     powerOutage.currentTime = 0; powerOutage.pause();
@@ -334,6 +337,8 @@ function resetSounds() {
 }
 function updateGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (night == 6) {ctx.filter = 'grayscale(100%) contrast(500%) saturate(200%)';}
+    if (night == 7) {ctx.filter = 'sepia(1) hue-rotate(-50deg) contrast(500%) saturate(200%)';}
     if (!winState && !deathState) {
         if (power > 0) {
             if (singleTapKeys["KeyA"]) {
@@ -717,7 +722,7 @@ function updateGame() {
             ctx.fillStyle = "white"
             ctx.globalAlpha = bellSoundAnimationFrame[0];
             ctx.font = "bold 150px FnafFont"
-            if (night < 6) {
+            if (night < 7) {
                 ctx.fillText(`Night ${night}`, canvas.width/2.8, 300);
             } else {
                 ctx.fillText(`Beemathon`, canvas.width/3.5, 300);
@@ -783,6 +788,7 @@ function updateGame() {
             document.getElementById('titleScreen').style.display = 'block';
         }
     }
+    ctx.filter = 'none';
     if (deathState) {
         if(deathBy == "beems") {
             deathAnimationTimer++;
