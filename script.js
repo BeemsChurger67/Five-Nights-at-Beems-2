@@ -130,15 +130,15 @@ let nightLines = [night1Line, night2Line, night3Line];
 let whichCharacterReset = 0;
 let deathFrame = false;
 let characters = [ // 44 opacity
-    ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS],
-    ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS],
+    ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
+    ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
     ["bryan", Math.random() * 20*FPS + 10*FPS, 7*FPS, 1, 1*FPS],
     ["jane", Math.random() * 20*FPS + 10*FPS, 2*FPS, 1, 0.5*FPS],
     ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 2 + 2),false], // wigCam | wigTaken
     ["zennix", 0, 0, 1, 999999*FPS],
     ["local", 0, 1.5*FPS, 1, 0, false], // active
-    ["noah", Math.random() * 20*FPS + 10*FPS,8*FPS,1,1*FPS,401,false], // x | side
-    ["glitch", Math.random() * 20*FPS + 10*FPS,10*FPS,1,0, Math.round(Math.random()*3)], // cam
+    ["noah", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.25*FPS,401,false], // x | side
+    ["glitch", Math.random() * 20*FPS + 10*FPS,10*FPS,1,0, Math.round(Math.random()*2)], // cam
     ["serbian", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.75*FPS],
     ["bryanEgg"],
 ] // character | spawnTimer | killTimer | difficulty | leaveTimer | extra 1 | extra 2...
@@ -146,13 +146,13 @@ let ingameCharacters = [];
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const eachNightDifficulty = [
-    [1.0, 1.0],
-    [1.4, 1.4, 1.0, 1.0],
-    [1.8, 1.8, 1.4, 1.4, 1.0, 1.0],
-    [2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0],
-    [2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0],
-    [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5],
-    [4.5, 6.0, 4.0, 5.0, 100, 6.0, 100, 4.0, 10.0, 4.0]
+    [1.0, 1.0], // night 1
+    [1.4, 1.4, 1.0, 1.0], // night 2
+    [1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 3
+    [2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 4
+    [2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 5
+    [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5], // night 6
+    [4.5, 6.0, 4.0, 5.0, 100, 6.0, 100, 4.0, 10.0, 4.0] // beemathon
 ]
 document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
 document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
@@ -447,6 +447,8 @@ function updateGame() {
                         deathState = true;
                         deathBy = ingameCharacters[i][0];
                     }
+                } else {
+                    if (powerConsumers[2] && cam == 6 && cameraAnimationFrame[0] > 25) {ctx.drawImage(beemsCharacter,canvas.width/2-100-150, canvas.height/2-350, 200, 400)}
                 }
             }
             if (ingameCharacters[i][0] == "jolly beems") {
@@ -470,6 +472,8 @@ function updateGame() {
                         deathState = true;
                         deathBy = ingameCharacters[i][0];
                     }
+                } else {
+                    if (powerConsumers[2] && cam == 6 && cameraAnimationFrame[0] > 25) {ctx.drawImage(jollyBeemsCharacter,canvas.width/2-100+150, canvas.height/2-350, 200, 400)}
                 }
             }
             if (ingameCharacters[i][0] == "bryan") {
@@ -493,28 +497,6 @@ function updateGame() {
                         deathState = true;
                         deathBy = ingameCharacters[i][0]
                     }
-                }
-            }
-            if (ingameCharacters[i][0] == "serbian") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
-                if (ingameCharacters[i][1] > 0) {
-                    if (!powerConsumers[2]) {ctx.drawImage(windowSerbian,-cameraX/3 + canvas.width/2+500, 527, 135, 200)};
-                } else {
-                    ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (powerConsumers[1]) {
-                        ingameCharacters[i][4]--;
-                        ingameCharacters[i][2]+= 1 * ingameCharacters[i][3];
-                        if (ingameCharacters[i][4] < 0) {
-                            ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
-                            ingameCharacters[i][2] = 7*FPS;
-                            ingameCharacters[i][4] = 0.75*FPS;
-                            serbianRage.play();
-                        }
-                    }
-                }
-                if(ingameCharacters[i][2] < 0) {
-                    deathState = true;
-                    deathBy = ingameCharacters[i][0];
                 }
             }
             if (ingameCharacters[i][0] == "jane") {
@@ -625,7 +607,6 @@ function updateGame() {
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (!powerConsumers[2]) {ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 540, 200, 400)}
-                    console.log(ingameCharacters[i][4], distance(-cameraX/3 + ingameCharacters[i][5], 540, mouse.x, mouse.y) < 200)
                     if (ingameCharacters[i][5] > 2200) {ingameCharacters[i][6] = true}
                     if (ingameCharacters[i][5] < 400) {ingameCharacters[i][6] = false}
                     if (ingameCharacters[i][6]) {ingameCharacters[i][5] -= 18} else {ingameCharacters[i][5] += 18}
@@ -650,35 +631,58 @@ function updateGame() {
             }
             if (ingameCharacters[i][0] == "glitch") {
                 console.log(ingameCharacters[i][1])
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
-                if (ingameCharacters[i][1] < 0 && ingameCharacters[i][1] > -1 * ingameCharacters[i][3]) {
+                ingameCharacters[i][1]-= 11.5 * ingameCharacters[i][3];
+                if (ingameCharacters[i][1] < 0 && ingameCharacters[i][1] > -11.5 * ingameCharacters[i][3]) {
                     glitchSpawnSound.play();
                 }
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2] -= 1;
-                    if (ingameCharacters[i][5] == 3) {
+                    if (ingameCharacters[i][5] >= 2) {
                         if (powerConsumers[2] && cam == 6 && cameraAnimationFrame[0] > 25) {
-                            ctx.drawImage(glitchCharacter,canvas.width / 2,canvas.height / 2,250,250);
+                            ctx.drawImage(glitchCharacter,canvas.width / 2,canvas.height / 2+200,250,250);
+                            if (collide(mouse.x,mouse.y,1,1,canvas.width / 2,canvas.height / 2+200,250,250) && frameClick) {
+                                ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
+                                ingameCharacters[i][2] = 10*FPS;
+                                ingameCharacters[i][5] = Math.round(Math.random()*3);
+                            }
                         }
-                        if (powerConsumers[2] && cam == 6 && collide(mouse.x,mouse.y,1,1,canvas.width / 2-125,canvas.height / 2-125,250,250) && frameClick) {
-                            ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
-                            ingameCharacters[i][2] = 10*FPS;
-                            ingameCharacters[i][5] = Math.round(Math.random()*2);
-                        }
+
                     } else {
                         if (powerConsumers[2] && cam == ingameCharacters[i][5] && cameraAnimationFrame[0] > 25) {
                             ctx.drawImage(glitchCharacter,canvas.width / 2,canvas.height / 2,250,250);
-                        }
-                        if (powerConsumers[2] && cam == ingameCharacters[i][5] && collide(mouse.x,mouse.y,1,1,canvas.width / 2,canvas.height / 2,250,250) && frameClick) {
-                            ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
-                            ingameCharacters[i][2] = 10*FPS;
-                            ingameCharacters[i][5] = Math.round(Math.random()*2);
+                            if (collide(mouse.x,mouse.y,1,1,canvas.width / 2,canvas.height / 2,250,250) && frameClick) {
+                                ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
+                                ingameCharacters[i][2] = 10*FPS;
+                                ingameCharacters[i][5] = Math.round(Math.random()*3);   
+                            }
                         }
                     }
                     if(ingameCharacters[i][2] < 0) {
                         deathState = true;
                         deathBy = ingameCharacters[i][0]
                     }
+                }
+            }
+            if (ingameCharacters[i][0] == "serbian") {
+                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                if (ingameCharacters[i][1] > 0) {
+                    if (!powerConsumers[2]) {ctx.drawImage(windowSerbian,-cameraX/3 + canvas.width/2+500, 527, 135, 200)};
+                } else {
+                    ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
+                    if (powerConsumers[1]) {
+                        ingameCharacters[i][4]--;
+                        ingameCharacters[i][2]+= 1 * ingameCharacters[i][3];
+                        if (ingameCharacters[i][4] < 0) {
+                            ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
+                            ingameCharacters[i][2] = 7*FPS;
+                            ingameCharacters[i][4] = 0.75*FPS;
+                            serbianRage.play();
+                        }
+                    }
+                }
+                if(ingameCharacters[i][2] < 0) {
+                    deathState = true;
+                    deathBy = ingameCharacters[i][0];
                 }
             }
         }
@@ -713,7 +717,11 @@ function updateGame() {
             ctx.fillStyle = "white"
             ctx.globalAlpha = bellSoundAnimationFrame[0];
             ctx.font = "bold 150px FnafFont"
-            ctx.fillText(`Night ${night}`, canvas.width/2.8, 300);
+            if (night < 6) {
+                ctx.fillText(`Night ${night}`, canvas.width/2.8, 300);
+            } else {
+                ctx.fillText(`Beemathon`, canvas.width/3.5, 300);
+            }
             ctx.globalAlpha = 1.0;
         }
         ctx.fillStyle = "black";

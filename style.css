@@ -101,12 +101,12 @@ button {
 #night6 {
     color: red;
 }
-#beematron {
+#beemathon {
     font-family: "intenseFont", sans-serif;
     color: red;
     transition: ease 0.3s;
 }
-#beematron:hover {
+#beemathon:hover {
     background-image: url("assets/redStatic.gif");
     color: white;
 }
