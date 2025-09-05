@@ -631,8 +631,8 @@ function updateGame() {
             }
             if (ingameCharacters[i][0] == "glitch") {
                 console.log(ingameCharacters[i][1])
-                ingameCharacters[i][1]-= 11.5 * ingameCharacters[i][3];
-                if (ingameCharacters[i][1] < 0 && ingameCharacters[i][1] > -11.5 * ingameCharacters[i][3]) {
+                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                if (ingameCharacters[i][1] < 0 && ingameCharacters[i][1] > -0.5 * ingameCharacters[i][3]) {
                     glitchSpawnSound.play();
                 }
                 if (ingameCharacters[i][1] < 0) {
