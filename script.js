@@ -21,8 +21,8 @@ let night1Line = new Audio('assets/night1Line.mp3');
 let night2Line = new Audio('assets/night2Line.mp3');
 let night3Line = new Audio('assets/night3Line.mp3');
 let night4Line = new Audio('assets/night4Line.mp3');
-//let night5Line = new Audio('assets/night5Line.mp3');
-//let night6Line = new Audio('assets/night6Line.mp3');
+let night5Line = new Audio('assets/night5Line.mp3');
+let night6Line = new Audio('assets/night6Line.mp3');
 
 let office = new Image();
 office.src = 'assets/office.png';
@@ -126,7 +126,7 @@ let night = 0;
 let FPS = 120;
 let nightLineTimer = [7*FPS, false];
 let lineSkipTimer = [15*FPS, false];
-let nightLines = [night1Line, night2Line, night3Line];
+let nightLines = [night1Line, night2Line, night3Line, night4Line, night5Line, night6Line];
 let whichCharacterReset = 0;
 let deathFrame = false;
 let nightVisuals = 0;
@@ -153,7 +153,7 @@ const eachNightDifficulty = [
     [2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 4
     [2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 5
     [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5], // night 6
-    [4.5, 6.0, 4.0, 5.0, 100, 6.0, 100, 4.0, 10.0, 4.0] // beemathon
+    [5.0, 5.0, 3.5, 5.0, 100, 6.0, 100, 4.0, 10.0, 4.0] // beemathon
 ]
 document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
 document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
@@ -252,6 +252,10 @@ function selectNight(nightSelected) {
     inGame = true;
     power = 100;
     nightTimer = [0,270*FPS];
+    if (nightSelected == 6) {power = 125;}
+    if (nightSelected == 6) {nightTimer[1] = 300*FPS;}
+    if (nightSelected == 7) {power = 225;}
+    if (nightSelected == 7) {nightTimer[1] = 600*FPS;}
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
@@ -286,6 +290,9 @@ function selectNight(nightSelected) {
     deathAnimationTimer = 0;
     nightLineTimer = [7*FPS, false];
     lineSkipTimer = [15*FPS, false];
+    for (let key in singleTapKeys) {
+        singleTapKeys[key] = false;
+    }
     gameInterval = setInterval(updateGame, 1000/FPS);
 }
 function collide(x1, y1, w1, h1, x2, y2, w2, h2) {
@@ -414,6 +421,12 @@ function updateGame() {
         if (cameraAnimationFrame[1] === 20) {
             cameraAnimationFrame[1] = 0;
         }
+        if (night == 6) {
+            cameraAnimationFrame[0]+=5;
+        }
+        if (night == 7) {
+            cameraAnimationFrame[0]+=26;
+        }
         if (cameraAnimationFrame[0] < 25) {
             staticSound.play();
             ctx.drawImage(cameraAnimationFrame[1] > 10 ? static1 : static2, 0,0,canvas.width,canvas.height);
@@ -486,7 +499,7 @@ function updateGame() {
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 527, 135, 200)}
-                    if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2, 527, mouse.x, mouse.y) < 200) {
+                    if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2+135/2, 527+100, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 1 * ingameCharacters[i][3];
                     }
@@ -615,7 +628,7 @@ function updateGame() {
                     if (ingameCharacters[i][5] > 2200) {ingameCharacters[i][6] = true}
                     if (ingameCharacters[i][5] < 400) {ingameCharacters[i][6] = false}
                     if (ingameCharacters[i][6]) {ingameCharacters[i][5] -= 18} else {ingameCharacters[i][5] += 18}
-                    if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5], 540, mouse.x, mouse.y) < 300) {
+                    if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5]+100, 540+200, mouse.x, mouse.y) < 300) {
                         ingameCharacters[i][4]--;
                     }
                     if (ingameCharacters[i][4] < 0) {
@@ -635,7 +648,6 @@ function updateGame() {
                 }
             }
             if (ingameCharacters[i][0] == "glitch") {
-                console.log(ingameCharacters[i][1])
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0 && ingameCharacters[i][1] > -0.5 * ingameCharacters[i][3]) {
                     glitchSpawnSound.play();
@@ -760,8 +772,11 @@ function updateGame() {
     ctx.fillStyle = "white";
     ctx.font = "bold 75px FnafFont";
     ctx.fillText(`Power: ${power.toFixed(1)}%`, 30, 1000);
-    ctx.fillText(`${Math.round((nightTimer[0]/nightTimer[1]*6)-0.5)}AM`, 30, 1100);
-    
+    if (night == 7) {
+        ctx.fillText(`${(nightTimer[0]/nightTimer[1]*6).toFixed(4)}AM`, 30, 1100);
+    } else {
+        ctx.fillText(`${Math.round((nightTimer[0]/nightTimer[1]*6)-0.5)}AM`, 30, 1100);
+    }
     frameClick = false;
     if (nightTimer[0] >= nightTimer[1]) {
         winState = true;
