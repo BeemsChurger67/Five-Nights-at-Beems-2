@@ -498,7 +498,7 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 527, 135, 200)}
+                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 627, 135, 300)}
                     if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2+135/2, 527+100, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 1 * ingameCharacters[i][3];
@@ -550,7 +550,7 @@ function updateGame() {
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1;
                     bubzeeeLocate.play();
-                    if (!powerConsumers[2]) {ctx.drawImage(bubzeeeCharacter,-cameraX/3 + 800, 488, 300, 400)}
+                    if (!powerConsumers[2]) {ctx.drawImage(bubzeeeCharacter,-cameraX/3 + 800, 530, 300, 400)}
                     if (powerConsumers[2] && cam == ingameCharacters[i][4] && cameraAnimationFrame[0] > 25) {
                         ctx.drawImage(bubzeeeWig,canvas.width/2-250, canvas.height/2-250, 500, 500);
                         if (collide(mouse.x,mouse.y,1,1,canvas.width/2-250, canvas.height/2-250, 500, 500) && frameClick) {
@@ -624,11 +624,11 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 540, 200, 400)}
+                    if (!powerConsumers[2]) {ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 600, 200, 400)}
                     if (ingameCharacters[i][5] > 2200) {ingameCharacters[i][6] = true}
                     if (ingameCharacters[i][5] < 400) {ingameCharacters[i][6] = false}
                     if (ingameCharacters[i][6]) {ingameCharacters[i][5] -= 18} else {ingameCharacters[i][5] += 18}
-                    if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5]+100, 540+200, mouse.x, mouse.y) < 300) {
+                    if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5]+100, 600+200, mouse.x, mouse.y) < 300) {
                         ingameCharacters[i][4]--;
                     }
                     if (ingameCharacters[i][4] < 0) {
@@ -846,7 +846,7 @@ function updateGame() {
             if (deathAnimationTimer >= 3*60) { 
                 backMainMenu();
             } else {
-                ctx.drawImage(janeCharacter,0,0,canvas.width,canvas.height);
+                ctx.drawImage(bubzeeeCharacter,0,0,canvas.width,canvas.height);
                 resetSounds();
             }
         }
