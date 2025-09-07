@@ -128,6 +128,7 @@ let cameraAnimationFrame = [0,0,false] // animationTime | animation | if played
 let cam = 0;
 let frameClick = false;
 let click = false;
+let customNightClickSpeed = [120,20];
 let night = 0;
 let FPS = 120;
 let nightLineTimer = [7*FPS, false];
@@ -199,6 +200,7 @@ window.addEventListener("mousedown", (e) => {
 })
 window.addEventListener("mouseup", (e) => {
     click = false;
+    
 })
 window.addEventListener('keyup', (e) => {
     keys[e.code] = false;
@@ -290,6 +292,11 @@ function updateMenu() {
             document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
         }
     }
+    if (click) {
+        customNightClickSpeed[0]--;
+    } else {
+        customNightClickSpeed[0] = 0.5*FPS;
+    }
     cnCtx.clearRect(0, 0, cnCanvas.width, cnCanvas.height);
     cnCtx.fillStyle = "black";
     cnCtx.fillRect(1600,950-150,300,100);
@@ -346,10 +353,11 @@ function updateMenu() {
             cnCtx.fillStyle = "white";
             cnCtx.font = "30px Arial";
             cnCtx.fillText("▼",298 + i*305 - customNightA[0],285 + customNightA[1]+30);
-            if (collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],285 + customNightA[1],25,40) && frameClick && inMenus[3]) {
+            if (collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],285 + customNightA[1],25,40) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],285 + customNightA[1],25,40)) {
                 customNightDifficulty[i] -= 0.1;
                 frameClick = false;
             }
+            console.log(customNightClickSpeed)
             cnCtx.fillStyle = "green";
             cnCtx.font = "30px FnafFont";
             cnCtx.fillText((customNightDifficulty[i]*10-9).toFixed(0), 35 + i*305 - customNightA[0], 340 + customNightA[1]);
@@ -359,7 +367,7 @@ function updateMenu() {
         cnCtx.fillStyle = "white";
         cnCtx.font = "30px Arial";
         cnCtx.fillText("▲",298 + i*305 - customNightA[0],245 + customNightA[1]+30);
-        if (collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],245 + customNightA[1],25,40) && frameClick && inMenus[3]) {
+        if (collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],245 + customNightA[1],25,40) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],245 + customNightA[1],25,40)) {
             customNightDifficulty[i] += 0.1;
         }
     }
@@ -801,7 +809,7 @@ function updateGame() {
                 }
             }
             if (ingameCharacters[i][0] == "noah") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1]-= 55.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (!powerConsumers[2]) {ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 600, 200, 400)}
@@ -811,6 +819,7 @@ function updateGame() {
                     if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5]+100, 600+200, mouse.x, mouse.y) < 300) {
                         ingameCharacters[i][4]--;
                     }
+                    ctx.fillStyle = "red";
                     if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
