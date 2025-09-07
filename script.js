@@ -64,6 +64,8 @@ let cam5 = new Image();
 cam5.src = 'assets/cam5.png';
 let cam6 = new Image();
 cam6.src = 'assets/cam6.png';
+let CustomNightBg = new Image();
+CustomNightBg.src = 'assets/CustomNightBg.jpg';
 let beemsCharacter = new Image();
 beemsCharacter.src = "assets/beemscat.png";
 let jollyBeemsCharacter = new Image();
@@ -95,10 +97,11 @@ let staticDelay = Math.random() * 600+100;
 let staticLength = 60;
 let windowSize = [window.innerWidth, window.innerHeight];
 let inGame = false;
-let inMenus = [false, false];
+let inMenus = [false, false, false, false, false, false, false]; // night selector | credits | settings | custom night
 let menuInterval = null;
 let gameInterval = null;
 let mouse = {x: 0, y: 0};
+let cnMouse = {x: 0, y: 0};
 let inCamera = false;
 let keys = {};
 let singleTapKeys = {}
@@ -109,6 +112,7 @@ let maskAnimationFrame = 0;
 let power = 100;
 let powerOutState = false;
 let nightTimer = [0,60*240];
+let nightLength = 270; // in seconds
 let powerConsumers = [false,false,false,false] // left door | right door | cams | flashlight
 let winState = false;
 let deathState = false;
@@ -122,6 +126,7 @@ let cameraY = 0;
 let cameraAnimationFrame = [0,0,false] // animationTime | animation | if played
 let cam = 0;
 let frameClick = false;
+let click = false;
 let night = 0;
 let FPS = 120;
 let nightLineTimer = [7*FPS, false];
@@ -130,6 +135,8 @@ let nightLines = [night1Line, night2Line, night3Line, night4Line, night5Line, ni
 let whichCharacterReset = 0;
 let deathFrame = false;
 let nightVisuals = 0;
+let customNightA = [0,0];
+let customNightLength = 270;
 let characters = [ // 44 opacity
     ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
     ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
@@ -141,11 +148,24 @@ let characters = [ // 44 opacity
     ["noah", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.25*FPS,401,false], // x | side
     ["glitch", Math.random() * 20*FPS + 10*FPS,10*FPS,1,0, Math.round(Math.random()*2)], // cam
     ["serbian", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.75*FPS],
-    ["bryanEgg"],
-] // character | spawnTimer | killTimer | difficulty | leaveTimer | extra 1 | extra 2...
+]
 let ingameCharacters = [];
+let customNightImages = [
+    beemsCharacter,
+    jollyBeemsCharacter,
+    bryanDeath,
+    janeCharacter,
+    bubzeeeCharacter,
+    zennixCharacter,
+    localCharacter,
+    noahCharacter,
+    glitchCharacter,
+    serbianCharacter
+]
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const cnCanvas = document.getElementById('customNight');
+const cnCtx = cnCanvas.getContext('2d');
 const eachNightDifficulty = [
     [1.0, 1.0], // night 1
     [1.4, 1.4, 1.0, 1.0], // night 2
@@ -155,6 +175,7 @@ const eachNightDifficulty = [
     [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5], // night 6
     [5.0, 5.0, 3.5, 5.0, 100, 6.0, 100, 4.0, 10.0, 4.0] // beemathon
 ]
+let customNightDifficulty = [0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9];
 document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
 document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
 menuMusic.loop = true;
@@ -173,6 +194,10 @@ window.addEventListener('keydown', (e) => {
 })
 window.addEventListener("mousedown", (e) => {
     frameClick = true;
+    click = true
+})
+window.addEventListener("mouseup", (e) => {
+    click = false;
 })
 window.addEventListener('keyup', (e) => {
     keys[e.code] = false;
@@ -187,8 +212,27 @@ canvas.addEventListener('mousemove', function(event) {
         mouse.x = (event.clientX - rect.left) * (canvas.width / rect.width);
         mouse.y = (event.clientY - rect.top) * (canvas.height / rect.height);
     }
-    //console.log(mouse);
 })
+cnCanvas.addEventListener('mousemove', function(event) {
+    const rect = cnCanvas.getBoundingClientRect();
+    cnMouse.x = (event.clientX - rect.left) * (cnCanvas.width / rect.width);
+    cnMouse.y = (event.clientY - rect.top) * (cnCanvas.height / rect.height);
+})
+function resetCharacters() {
+    characters = [ // 44 opacity
+        ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
+        ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
+        ["bryan", Math.random() * 20*FPS + 10*FPS, 7*FPS, 1, 1*FPS],
+        ["jane", Math.random() * 20*FPS + 10*FPS, 2*FPS, 1, 0.5*FPS],
+        ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 2 + 2),false], // wigCam | wigTaken
+        ["zennix", 0, 0, 1, 999999*FPS],
+        ["local", 0, 1.5*FPS, 1, 0, false], // active
+        ["noah", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.25*FPS,401,false], // x | side
+        ["glitch", Math.random() * 20*FPS + 10*FPS,10*FPS,1,0, Math.round(Math.random()*2)], // cam
+        ["serbian", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.75*FPS],
+    ]
+}
+resetCharacters();
 function nightSelectorOpen() {
     if (!inMenus[0]) {
         document.getElementById('nightSelector').classList.add('active');
@@ -219,7 +263,16 @@ function creditsOpen() {
     }
     inMenus[1] = !inMenus[1];
 }
-
+function customNightOpen() {
+    if (!inMenus[3]) {
+        document.getElementById('customNight').classList.add('active');
+        document.getElementById('customNight').classList.remove('close');
+    } else {
+        document.getElementById('customNight').classList.add('close');
+        document.getElementById('customNight').classList.remove('active');
+    }
+    inMenus[3] = !inMenus[3];
+}
 function updateMenu() {
     menuMusic.play();
     if(menuMusic.volume < 0.50) {
@@ -236,8 +289,81 @@ function updateMenu() {
             document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
         }
     }
+    cnCtx.clearRect(0, 0, cnCanvas.width, cnCanvas.height);
+    cnCtx.fillStyle = "black";
+    cnCtx.fillRect(1600,950-150,300,100);
+    cnCtx.fillStyle = "white";
+    cnCtx.font = "90px FnafFont";
+    cnCtx.fillText("Start", 1605, 1095-145);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1600,800,300,100) && frameClick && inMenus[3]) {
+        startCustomNight();
+    }
+    cnCtx.fillStyle = "black";
+    cnCtx.fillRect(1600,950,300,100);
+    cnCtx.fillStyle = "white";
+    cnCtx.font = "90px FnafFont";
+    cnCtx.fillText("Back", 1625, 1095);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1600,950,300,100) && frameClick && inMenus[3]) {
+        customNightOpen();
+    }
+    cnCtx.fillStyle = "black";
+    cnCtx.fillRect(1600,650,300,100); // box
+    cnCtx.fillRect(1850,650,50,50); // up
+    cnCtx.fillRect(1850,700,50,50); // down
+    cnCtx.fillStyle = "white";
+    cnCtx.font = "40px arial";
+    cnCtx.fillText('▲', 1852,690);
+    cnCtx.fillText('▼', 1852,740);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1850,650,50,50) && click && inMenus[3]) {customNightLength++;}
+    if (collide(cnMouse.x,cnMouse.y,1,1,1850,700,50,50) && click && inMenus[3] && customNightLength > 1) {customNightLength--;}
+    cnCtx.font = "40px FnafFont";
+    cnCtx.fillText("Duration", 1615, 720);
+    cnCtx.fillText(`${customNightLength}s`, 1615, 770);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1600,950,300,100) && frameClick && inMenus[3]) {
+        customNightOpen();
+    }
+    cnCtx.fillStyle = "white";
+    for (let i = 0; i<characters.length; i++) {
+        if (i > 4) {
+            customNightA[0] = 305*5;
+            customNightA[1] = 460;
+        } else {
+            customNightA[0] = 0;
+            customNightA[1] = 0;
+        }
+        cnCtx.fillStyle = "white";
+        cnCtx.drawImage(CustomNightBg, 25 + i*305 - customNightA[0],25 + customNightA[1],300,300);
+        cnCtx.drawImage(customNightImages[i], 75 + i*305 - customNightA[0],25 + customNightA[1],200,200);
+        cnCtx.fillStyle = "black";
+        cnCtx.font = "30px FnafFont";
+        cnCtx.fillText(characters[i][0], 50 + i*305 - customNightA[0], 300 + customNightA[1]);
+        if (customNightDifficulty[i] == 0.9) {
+            cnCtx.fillStyle = "red";
+            cnCtx.fillText("❌", 25 + i*305 - customNightA[0], 320  + customNightA[1]);
+        } else {
+            cnCtx.fillRect(300 + i*305 - customNightA[0],285 + customNightA[1],25,40);
+            cnCtx.fillStyle = "white";
+            cnCtx.font = "30px Arial";
+            cnCtx.fillText("▼",298 + i*305 - customNightA[0],285 + customNightA[1]+30);
+            if (collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],285 + customNightA[1],25,40) && frameClick && inMenus[3]) {
+                customNightDifficulty[i] -= 0.1;
+                frameClick = false;
+            }
+            cnCtx.fillStyle = "green";
+            cnCtx.font = "30px FnafFont";
+            cnCtx.fillText((customNightDifficulty[i]*10-9).toFixed(0), 35 + i*305 - customNightA[0], 340 + customNightA[1]);
+        }
+        cnCtx.fillStyle = "green"; // ▲▼
+        cnCtx.fillRect(300 + i*305 - customNightA[0],245 + customNightA[1],25,40);
+        cnCtx.fillStyle = "white";
+        cnCtx.font = "30px Arial";
+        cnCtx.fillText("▲",298 + i*305 - customNightA[0],245 + customNightA[1]+30);
+        if (collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],245 + customNightA[1],25,40) && frameClick && inMenus[3]) {
+            customNightDifficulty[i] += 0.1;
+        }
+    }
+    frameClick = false;
 }
-
 function selectNight(nightSelected) {
     menuMusic.volume = 0;
     document.getElementById('gameCanvas').style.display = 'block';
@@ -251,11 +377,14 @@ function selectNight(nightSelected) {
     clearInterval(menuInterval);
     inGame = true;
     power = 100;
+    nightLength = 270*FPS;
     nightTimer = [0,270*FPS];
     if (nightSelected == 6) {power = 125;}
     if (nightSelected == 6) {nightTimer[1] = 300*FPS;}
+    if (nightSelected == 6) {nightLength = 300*FPS;} 
     if (nightSelected == 7) {power = 225;}
     if (nightSelected == 7) {nightTimer[1] = 600*FPS;}
+    if (nightSelected == 7) {nightLength = 270*FPS;}
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
@@ -285,6 +414,57 @@ function selectNight(nightSelected) {
         }
     }
     console.log(ingameCharacters);
+    deathBy = "";
+    deathState = false;
+    deathAnimationTimer = 0;
+    nightLineTimer = [7*FPS, false];
+    lineSkipTimer = [15*FPS, false];
+    for (let key in singleTapKeys) {
+        singleTapKeys[key] = false;
+    }
+    resetCharacters();
+    gameInterval = setInterval(updateGame, 1000/FPS);
+}
+let a = 0;
+function startCustomNight() {
+    menuMusic.volume = 0;
+    document.getElementById('gameCanvas').style.display = 'block';
+    document.getElementById('titleScreen').style.display = 'none';
+    document.getElementById('nightSelector').classList.add('close');
+    document.getElementById('nightSelector').classList.remove('active');
+    document.getElementById('credits').classList.add('close');
+    document.getElementById('credits').classList.remove('active');
+    inMenus[0] = false;
+    inMenus[1] = false;
+    clearInterval(menuInterval);
+    night = Infinity;
+    inGame = true;
+    power = 100;
+    nightTimer[1] = customNightLength*FPS;
+    mask = false;
+    maskAnimationEnabling = false;
+    winState = false;
+    blackBgTransparency[0] = 1;
+    titleTime = 0;
+    for (let i = 0; i<powerConsumers.length; i++) {
+        powerConsumers[i] = false;
+    }
+    powerOutState = false;
+    cam = 0;
+    bellSoundAnimationFrame = [1,0,false];
+    ingameCharacters.splice(0,ingameCharacters.length);
+    deathFrame = false;
+    nightVisuals = 0;
+    resetCharacters();
+    a = 0;
+    for (let i = 0; i < characters.length; i++) {
+        if (customNightDifficulty[i] == 0.9) {
+            a += 1;
+            continue;
+        }
+        ingameCharacters.push(characters[i]);
+        ingameCharacters[i-a][3] = customNightDifficulty[i];
+    }
     deathBy = "";
     deathState = false;
     deathAnimationTimer = 0;
@@ -410,7 +590,6 @@ function updateGame() {
         cameraY = mouse.y
         nightTimer[0]++;
     }
-    
     ctx.drawImage(office, -cameraX/3,0, 2560, 1080);
     ctx.drawImage(powerConsumers[0] ? leftDoorClosed : leftDoorOpened, -cameraX/3 + 390, 180, 296, 902);
     ctx.drawImage(powerConsumers[1] ? rightDoorClosed : rightDoorOpened, -cameraX/3 + 1864, 180, 296, 902);
@@ -498,8 +677,8 @@ function updateGame() {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 627, 135, 300)}
-                    if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2+135/2, 527+100, mouse.x, mouse.y) < 200) {
+                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 477, 135, 250)}
+                    if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2+67, 477+125, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 1 * ingameCharacters[i][3];
                     }
@@ -734,10 +913,10 @@ function updateGame() {
             ctx.fillStyle = "white"
             ctx.globalAlpha = bellSoundAnimationFrame[0];
             ctx.font = "bold 150px FnafFont"
-            if (night < 7) {
-                ctx.fillText(`Night ${night}`, canvas.width/2.8, 300);
-            } else {
+            if (night == 7) {
                 ctx.fillText(`Beemathon`, canvas.width/3.5, 300);
+            } else {
+                ctx.fillText(`Night ${night}`, canvas.width/2.8, 300);
             }
             ctx.globalAlpha = 1.0;
         }

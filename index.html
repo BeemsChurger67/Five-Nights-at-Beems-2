@@ -13,6 +13,7 @@
             <button id="nightsButton" onclick="nightSelectorOpen()">Nights</button>
             <button id="settingsButton" onclick="settingsOpen()">Settings</button>
             <button id="creditsButton" onclick="creditsOpen()">Credits</button>
+            <button id="customNightButton" onclick="customNightOpen()">Custom Night</button>
         </div>
         <div id="settings">
             Speedhack (not implemented yet)
@@ -40,6 +41,7 @@
             <button id="night6" onclick="selectNight(6)">Night 6</button>
             <button id="beemathon" style="font-size: 2.3vw;" onclick="selectNight(7)">BEEMATHON</button>
         </div>
+        <canvas id="customNight" width="1920" height="1080"></canvas>
     </div>
     <canvas id="gameCanvas" width="1920" height="1080"></canvas>
     <script src="script.js"></script>
