@@ -1094,4 +1094,3 @@ function updateLoad() {
     }
 }
 let loadInterval = setInterval(updateLoad, 1000/FPS);
-menuInterval = setInterval(updateMenu, 1000/FPS);
