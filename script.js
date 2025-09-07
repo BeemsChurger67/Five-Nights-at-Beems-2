@@ -64,8 +64,8 @@ let cam5 = new Image();
 cam5.src = 'assets/cam5.png';
 let cam6 = new Image();
 cam6.src = 'assets/cam6.png';
-let CustomNightBg = new Image();
-CustomNightBg.src = 'assets/CustomNightBg.jpg';
+let customNightBg = new Image();
+customNightBg.src = 'assets/customNightBg.jpg';
 let beemsCharacter = new Image();
 beemsCharacter.src = "assets/beemscat.png";
 let jollyBeemsCharacter = new Image();
@@ -123,6 +123,7 @@ let bellSoundAnimationFrame = [1,0]; // opacity | time
 let titleTime = 0;
 let cameraX = 0;
 let cameraY = 0;
+let loadInTimer = 60;
 let cameraAnimationFrame = [0,0,false] // animationTime | animation | if played
 let cam = 0;
 let frameClick = false;
@@ -332,7 +333,7 @@ function updateMenu() {
             customNightA[1] = 0;
         }
         cnCtx.fillStyle = "white";
-        cnCtx.drawImage(CustomNightBg, 25 + i*305 - customNightA[0],25 + customNightA[1],300,300);
+        cnCtx.drawImage(customNightBg, 25 + i*305 - customNightA[0],25 + customNightA[1],300,300);
         cnCtx.drawImage(customNightImages[i], 75 + i*305 - customNightA[0],25 + customNightA[1],200,200);
         cnCtx.fillStyle = "black";
         cnCtx.font = "30px FnafFont";
@@ -1085,4 +1086,12 @@ function updateGame() {
     }
     singleTapS = false;
 }
+function updateLoad() {
+    loadInTimer--;
+    if (loadInTimer < 0) {
+        menuInterval = setInterval(updateMenu, 1000/FPS);
+        clearInterval(loadInterval);
+    }
+}
+let loadInterval = setInterval(updateLoad, 1000/FPS);
 menuInterval = setInterval(updateMenu, 1000/FPS);
