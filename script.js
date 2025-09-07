@@ -356,6 +356,7 @@ function updateMenu() {
             if (collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],285 + customNightA[1],25,40) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],285 + customNightA[1],25,40)) {
                 customNightDifficulty[i] -= 0.1;
                 frameClick = false;
+                if (customNightDifficulty[i] < 0.9) {customNightDifficulty[i] = 0.9;}
             }
             console.log(customNightClickSpeed)
             cnCtx.fillStyle = "green";
@@ -809,7 +810,7 @@ function updateGame() {
                 }
             }
             if (ingameCharacters[i][0] == "noah") {
-                ingameCharacters[i][1]-= 55.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (!powerConsumers[2]) {ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 600, 200, 400)}
