@@ -174,10 +174,10 @@ const eachNightDifficulty = [
     [3.0, 3.0, 2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4], // night 6
 ]
 let challenges = [
-    [[4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0],360, 125], // 10/30
-    [[5.0, 5.0, 3.5, 5.0, 101, 6.0, 101, 4.0, 10.0, 4.0],600, 250], // beemathon
+    [[3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5,],360, 125], // 10/25
+    [[5.0, 5.0, 3.5, 5.0, 101, 6.0, 5.0, 4.0, 10.0, 4.0],600, 250], // beemathon
     [[2.0, 2.0, 2.0, 2.0, 0.9, 2.0, 0.9, 2.0, 0.9, 0.9],200, 100], // meows attack
-    [[0.9, 0.9, 0.9, 5, 101, 11, 0.9, 0.9, 101, 0.9],120, 100] //camamask
+    [[0.9, 0.9, 0.9, 5, 101, 11, 0.9, 0.9, 101, 0.9],120, 100] // camamask
 ];
 let customNightClickSpeed = [120,20];
 let customNightA = [0,0];
@@ -449,12 +449,6 @@ function selectNight(nightSelected) {
     power = 100;
     nightLength = 270*FPS;
     nightTimer = [0,270*FPS];
-    if (nightSelected == 6) {power = 125;}
-    if (nightSelected == 6) {nightTimer[1] = 300*FPS;}
-    if (nightSelected == 6) {nightLength = 300*FPS;} 
-    if (nightSelected == 7) {power = 225;}
-    if (nightSelected == 7) {nightTimer[1] = 600*FPS;}
-    if (nightSelected == 7) {nightLength = 270*FPS;}
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
@@ -491,11 +485,6 @@ function selectNight(nightSelected) {
     lineSkipTimer = [15*FPS, false];
     for (let key in singleTapKeys) {
         singleTapKeys[key] = false;
-    }
-    for (let a = 0; a<characters.length; a++) {
-        for (let i = 0; i<effectChallengesActive.length; i++) {
-            if (customNightDifficulty[i] == challenges[i][0][a]) {}
-        }
     }
     resetCharacters();
     gameInterval = setInterval(updateGame, 1000/FPS);
@@ -702,10 +691,10 @@ function updateGame() {
         if (cameraAnimationFrame[1] === 20) {
             cameraAnimationFrame[1] = 0;
         }
-        if (night == 6) {
+        if (effectChallengesActive[0]) {
             cameraAnimationFrame[0]+=5;
         }
-        if (night == 7) {
+        if (effectChallengesActive[1]) {
             cameraAnimationFrame[0]+=26;
         }
         if (cameraAnimationFrame[0] < 25) {
@@ -911,12 +900,13 @@ function updateGame() {
                     if (ingameCharacters[i][6]) {ingameCharacters[i][5] -= 18} else {ingameCharacters[i][5] += 18}
                     if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5]+100, 600+200, mouse.x, mouse.y) < 300) {
                         ingameCharacters[i][4]--;
+                        console.log(ingameCharacters[i][4]);
                     }
                     ctx.fillStyle = "red";
                     if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
-                        ingameCharacters[i][4] = 1*FPS;
+                        ingameCharacters[i][4] = 0.25*FPS;
                         ingameCharacters[i][5] = 300;
                         ingameCharacters[i][6] = false;
                         beemsLeave.pause(); 
