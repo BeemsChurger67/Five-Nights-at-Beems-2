@@ -128,7 +128,6 @@ let cameraAnimationFrame = [0,0,false] // animationTime | animation | if played
 let cam = 0;
 let frameClick = false;
 let click = false;
-let customNightClickSpeed = [120,20];
 let night = 0;
 let FPS = 120;
 let nightLineTimer = [7*FPS, false];
@@ -137,8 +136,6 @@ let nightLines = [night1Line, night2Line, night3Line, night4Line, night5Line, ni
 let whichCharacterReset = 0;
 let deathFrame = false;
 let nightVisuals = 0;
-let customNightA = [0,0];
-let customNightLength = 270;
 let characters = [ // 44 opacity
     ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
     ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
@@ -174,9 +171,19 @@ const eachNightDifficulty = [
     [1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 3
     [2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 4
     [2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 5
-    [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5], // night 6
-    [5.0, 5.0, 3.5, 5.0, 100, 6.0, 100, 4.0, 10.0, 4.0] // beemathon
+    [3.0, 3.0, 2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4], // night 6
 ]
+let challenges = [
+    [[4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0],360, 125], // 10/30
+    [[5.0, 5.0, 3.5, 5.0, 101, 6.0, 101, 4.0, 10.0, 4.0],600, 250], // beemathon
+    [[2.0, 2.0, 2.0, 2.0, 0.9, 2.0, 0.9, 2.0, 0.9, 0.9],200, 100], // meows attack
+    [[0.9, 0.9, 0.9, 5, 101, 11, 0.9, 0.9, 101, 0.9],120, 100] //camamask
+];
+let customNightClickSpeed = [120,20];
+let customNightA = [0,0];
+let customNightLength = 270;
+let customNightPower = 100;
+let effectChallengesActive = [false,false];
 let customNightDifficulty = [0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9];
 document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
 document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
@@ -273,8 +280,20 @@ function customNightOpen() {
     } else {
         document.getElementById('customNight').classList.add('close');
         document.getElementById('customNight').classList.remove('active');
+        document.getElementById('customNightChallenges').classList.add('close');
+        document.getElementById('customNightChallenges').classList.remove('active');
     }
     inMenus[3] = !inMenus[3];
+}
+function showCustomNightChallenges() {
+    if (!inMenus[4]) {
+        document.getElementById('customNightChallenges').classList.add('active');
+        document.getElementById('customNightChallenges').classList.remove('close');
+    } else {
+        document.getElementById('customNightChallenges').classList.add('close');
+        document.getElementById('customNightChallenges').classList.remove('active');
+    }
+    inMenus[4] = !inMenus[4];
 }
 function updateMenu() {
     menuMusic.play();
@@ -298,7 +317,29 @@ function updateMenu() {
         customNightClickSpeed[0] = 0.5*FPS;
     }
     cnCtx.clearRect(0, 0, cnCanvas.width, cnCanvas.height);
-    cnCtx.fillStyle = "black";
+    cnCtx.fillStyle = "black";; // -1 all
+    cnCtx.fillRect(1600,50,300,100);
+    cnCtx.fillStyle = "white";
+    cnCtx.font = "80px FnafFont";
+    cnCtx.fillText("-1 All", 1615, 185);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1600,50,300,100) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,1600,50,300,100)) {
+        for (let i = 0; i<characters.length; i++) {
+            customNightDifficulty[i] -= 0.1;
+            if (customNightDifficulty[i] < 0.9) {customNightDifficulty[i] = 0.9;}
+        }
+    }
+
+    cnCtx.fillStyle = "black";; // +1 all
+    cnCtx.fillRect(1600,200,300,100);
+    cnCtx.fillStyle = "white";
+    cnCtx.font = "80px FnafFont";
+    cnCtx.fillText("+1 All", 1615, 335);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1600,200,300,100) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,1600,200,300,100)) {
+        for (let i = 0; i<characters.length; i++) {
+            customNightDifficulty[i] += 0.1;
+        }
+    }
+    cnCtx.fillStyle = "black";; // start night
     cnCtx.fillRect(1600,950-150,300,100);
     cnCtx.fillStyle = "white";
     cnCtx.font = "90px FnafFont";
@@ -306,7 +347,7 @@ function updateMenu() {
     if (collide(cnMouse.x,cnMouse.y,1,1,1600,800,300,100) && frameClick && inMenus[3]) {
         startCustomNight();
     }
-    cnCtx.fillStyle = "black";
+    cnCtx.fillStyle = "black"; // close
     cnCtx.fillRect(1600,950,300,100);
     cnCtx.fillStyle = "white";
     cnCtx.font = "90px FnafFont";
@@ -315,18 +356,38 @@ function updateMenu() {
         customNightOpen();
     }
     cnCtx.fillStyle = "black";
-    cnCtx.fillRect(1600,650,300,100); // box
+    cnCtx.fillRect(1600,650,300,100); // night duration
     cnCtx.fillRect(1850,650,50,50); // up
     cnCtx.fillRect(1850,700,50,50); // down
     cnCtx.fillStyle = "white";
     cnCtx.font = "40px arial";
     cnCtx.fillText('▲', 1852,690);
     cnCtx.fillText('▼', 1852,740);
-    if (collide(cnMouse.x,cnMouse.y,1,1,1850,650,50,50) && click && inMenus[3]) {customNightLength++;}
-    if (collide(cnMouse.x,cnMouse.y,1,1,1850,700,50,50) && click && inMenus[3] && customNightLength > 1) {customNightLength--;}
     cnCtx.font = "40px FnafFont";
     cnCtx.fillText("Duration", 1615, 720);
     cnCtx.fillText(`${customNightLength}s`, 1615, 770);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1850,650,50,50) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,1850,650,50,50)) {customNightLength++;}
+    if (collide(cnMouse.x,cnMouse.y,1,1,1850,700,50,50) && frameClick && inMenus[3] && customNightLength > 1 || customNightLength > 1 && customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,1850,700,50,50)) {customNightLength--;}
+    cnCtx.fillStyle = "black";
+    cnCtx.fillRect(1600,500,300,100); // power
+    cnCtx.font = "40px FnafFont";
+    cnCtx.fillStyle = "white";
+    cnCtx.fillText("Power", 1615, 415+150);
+    cnCtx.fillText(`${customNightPower}%`, 1615, 470+150);
+    cnCtx.font = "40px arial";
+    cnCtx.fillText('▲', 1852,390+150);
+    cnCtx.fillText('▼', 1852,440+150);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1850,500,50,50) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,1850,500,50,50)) {customNightPower++;}
+    if (collide(cnMouse.x,cnMouse.y,1,1,1850,550,50,50) && frameClick && inMenus[3] && customNightPower > 0 || customNightPower > 0 && customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,1850,550,50,50)) {customNightPower--;}
+
+    cnCtx.font = "40px FnafFont";
+    cnCtx.fillStyle = "black";
+    cnCtx.fillRect(1600,350,300,100); // challenges
+    cnCtx.fillStyle = "white";
+    cnCtx.fillText("Challenges", 1620, 440);
+    if (collide(cnMouse.x,cnMouse.y,1,1,1600,350,300,100) && frameClick && inMenus[3]) {
+        showCustomNightChallenges();
+    }
     if (collide(cnMouse.x,cnMouse.y,1,1,1600,950,300,100) && frameClick && inMenus[3]) {
         customNightOpen();
     }
@@ -358,10 +419,9 @@ function updateMenu() {
                 frameClick = false;
                 if (customNightDifficulty[i] < 0.9) {customNightDifficulty[i] = 0.9;}
             }
-            console.log(customNightClickSpeed)
             cnCtx.fillStyle = "green";
             cnCtx.font = "30px FnafFont";
-            cnCtx.fillText((customNightDifficulty[i]*10-9).toFixed(0), 35 + i*305 - customNightA[0], 340 + customNightA[1]);
+            cnCtx.fillText((customNightDifficulty[i]*10-10).toFixed(0), 35 + i*305 - customNightA[0], 340 + customNightA[1]);
         }
         cnCtx.fillStyle = "green"; // ▲▼
         cnCtx.fillRect(300 + i*305 - customNightA[0],245 + customNightA[1],25,40);
@@ -432,8 +492,31 @@ function selectNight(nightSelected) {
     for (let key in singleTapKeys) {
         singleTapKeys[key] = false;
     }
+    for (let a = 0; a<characters.length; a++) {
+        for (let i = 0; i<effectChallengesActive.length; i++) {
+            if (customNightDifficulty[i] == challenges[i][0][a]) {}
+        }
+    }
     resetCharacters();
     gameInterval = setInterval(updateGame, 1000/FPS);
+}
+function isCustomNightMatchingChallenge(challengeId) {
+    const challengeDiff = challenges[challengeId][0];
+    for (let i = 0; i < customNightDifficulty.length; i++) {
+        if (customNightDifficulty[i] !== challengeDiff[i]) {
+            return false;
+        }
+    }
+    if (customNightLength !== challenges[challengeId][1]) {return false;}
+    if (customNightPower !== challenges[challengeId][2]) {return false;}
+    return true;
+}
+function challengesSelect(challengeId) {
+    for (let i = 0; i<characters.length; i++) {
+        customNightDifficulty[i] = challenges[challengeId][0][i];
+    }
+    customNightLength = challenges[challengeId][1];
+    customNightPower = challenges[challengeId][2];
 }
 let a = 0;
 function startCustomNight() {
@@ -449,7 +532,7 @@ function startCustomNight() {
     clearInterval(menuInterval);
     night = Infinity;
     inGame = true;
-    power = 100;
+    power = customNightPower;
     nightTimer[1] = customNightLength*FPS;
     mask = false;
     maskAnimationEnabling = false;
@@ -475,6 +558,14 @@ function startCustomNight() {
         ingameCharacters.push(characters[i]);
         ingameCharacters[i-a][3] = customNightDifficulty[i];
     }
+    effectChallengesActive[0] = false;
+    effectChallengesActive[1] = false;
+    if (isCustomNightMatchingChallenge(0)) {
+        effectChallengesActive[0] = true;
+    }
+    if (isCustomNightMatchingChallenge(1)) {
+        effectChallengesActive[1] = true;
+    }
     deathBy = "";
     deathState = false;
     deathAnimationTimer = 0;
@@ -483,6 +574,7 @@ function startCustomNight() {
     for (let key in singleTapKeys) {
         singleTapKeys[key] = false;
     }
+    
     gameInterval = setInterval(updateGame, 1000/FPS);
 }
 function collide(x1, y1, w1, h1, x2, y2, w2, h2) {
@@ -534,8 +626,8 @@ function resetSounds() {
 }
 function updateGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (night == 6) {ctx.filter = 'grayscale(100%) contrast(500%) saturate(200%)';}
-    if (night == 7) {ctx.filter = 'sepia(1) hue-rotate(-50deg) contrast(500%) saturate(200%)';}
+    if (effectChallengesActive[0]) {ctx.filter = 'grayscale(200%) contrast(500%) saturate(200%)';}
+    if (effectChallengesActive[1]) {ctx.filter = 'sepia(1) hue-rotate(-50deg) contrast(500%) saturate(500%)';}
     if (!winState && !deathState) {
         if (power > 0) {
             if (singleTapKeys["KeyA"]) {
@@ -789,7 +881,7 @@ function updateGame() {
                     }
                     if (ingameCharacters[i][4]) {
                         ctx.drawImage(localCharacter,-cameraX/3 + canvas.width/2+400, canvas.height/2+130, 300, 400);
-                        ingameCharacters[i][2]--;
+                        ingameCharacters[i][2]-= 1 * ((ingameCharacters[i][3]/5)+1);
                         localGlitching.play();
                     }
                     if (mask) {
@@ -970,6 +1062,7 @@ function updateGame() {
     frameClick = false;
     if (nightTimer[0] >= nightTimer[1]) {
         winState = true;
+        resetSounds();
         sixAM.play();
         if (blackBgTransparency[0] < 1) {
             blackBgTransparency[1]++;

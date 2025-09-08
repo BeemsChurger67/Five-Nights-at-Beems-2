@@ -57,6 +57,41 @@ button {
 #credits.close {
     top: -500px;
 }
+#customNightChallenges {
+    position: fixed;
+    font-family: "FnafFont";
+    background-image: url('assets/nightSelectorStatic.gif');
+    padding: 20px 20px;
+    color: rgb(255, 255, 255);
+    left: 50%;
+    top: -500px;
+    transform: translate(-50%,-50%);
+    transition: top 1s cubic-bezier(0.1,1,0.1,1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#customNightChallenges.active {
+    top: 50%
+}
+#customNightChallenges.close {
+    top: -500px;
+}
+#customNightChallenges button {
+    height: 3vw;
+    width: 12vw;
+    font-size: 1.5vw;
+}
+#challenge1 {
+    font-family: "intenseFont", sans-serif;
+    color: red;
+    transition: ease 0.3s;
+}
+#challenge1:hover {
+    background-image: url("assets/redStatic.gif");
+    color: white;
+}
 #settings {
     position: fixed;
     font-family: "FnafFont";
@@ -78,7 +113,6 @@ button {
     width: 100%;
     height: 100%;
     transition: top 1s cubic-bezier(0.1,1,0.1,1);
-    text-align: center;
 }
 
 #customNight.active {
@@ -135,15 +169,6 @@ button {
 }
 #night6 {
     color: red;
-}
-#beemathon {
-    font-family: "intenseFont", sans-serif;
-    color: red;
-    transition: ease 0.3s;
-}
-#beemathon:hover {
-    background-image: url("assets/redStatic.gif");
-    color: white;
 }
 #cheatButton {
     position: fixed;
