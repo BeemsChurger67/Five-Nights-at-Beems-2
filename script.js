@@ -136,6 +136,7 @@ let nightLines = [night1Line, night2Line, night3Line, night4Line, night5Line, ni
 let whichCharacterReset = 0;
 let deathFrame = false;
 let nightVisuals = 0;
+let customNight = false;
 let characters = [ // 44 opacity
     ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
     ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
@@ -487,6 +488,7 @@ function selectNight(nightSelected) {
         singleTapKeys[key] = false;
     }
     resetCharacters();
+    customNight = false;
     gameInterval = setInterval(updateGame, 1000/FPS);
 }
 function isCustomNightMatchingChallenge(challengeId) {
@@ -509,6 +511,7 @@ function challengesSelect(challengeId) {
 }
 let a = 0;
 function startCustomNight() {
+    customNight = true;
     menuMusic.volume = 0;
     document.getElementById('gameCanvas').style.display = 'block';
     document.getElementById('titleScreen').style.display = 'none';
@@ -522,7 +525,7 @@ function startCustomNight() {
     night = Infinity;
     inGame = true;
     power = customNightPower;
-    nightTimer[1] = customNightLength*FPS;
+    nightTimer = [0,customNightLength*FPS];
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
@@ -1018,11 +1021,13 @@ function updateGame() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1.0;
     }
-    nightLineTimer[0]--;
-    if (nightLineTimer[0] < 0 && !nightLineTimer[1]) {
-        nightLineTimer[1] = true;
-        if (!lineSkipTimer[1]) {
-            nightLines[night-1].play();
+    if (!customNight) {
+        nightLineTimer[0]--;
+        if (nightLineTimer[0] < 0 && !nightLineTimer[1]) {
+            nightLineTimer[1] = true;
+            if (!lineSkipTimer[1]) {
+                nightLines[night-1].play();
+            }
         }
     }
     if (lineSkipTimer[0] > 0) {
