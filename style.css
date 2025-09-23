@@ -104,6 +104,12 @@ button {
     transition: top 1s cubic-bezier(0.1,1,0.1,1);
     text-align: center;
 }
+#settings.active {
+    top: 50%
+}
+#settings.close {
+    top: -500px;
+}
 #customNight {
     position: fixed;
     background-image: url('assets/darkStatic.gif');
@@ -127,6 +133,27 @@ button {
     background-image: url('assets/darkStatic.gif');
     transition: transform 0.2s ease;
 }
+#thankYous {
+    position: fixed;
+    font-family: "FnafFont";
+    background-image: url('assets/nightSelectorStatic.gif');
+    padding: 20px 20px;
+    color: rgb(255, 255, 255);
+    left: 50%;
+    top: -500px;
+    transform: translate(-50%,-50%);
+    transition: top 1s cubic-bezier(0.1,1,0.1,1);
+    text-align: center;
+}
+#settings.active {
+    top: 50%
+}
+#settings.close {
+    top: -500px;
+}
+#fpsInput {
+    width: 1.2vw;
+}
 #customNight button:hover {
     transform: scale(1.3);
 }
@@ -137,12 +164,6 @@ button {
     position: absolute;
     bottom: 1vw;
     right: 1vw;
-}
-#settings.active {
-    top: 50%
-}
-#settings.close {
-    top: -500px;
 }
 #nightSelector {
     position: fixed;

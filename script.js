@@ -14,6 +14,9 @@ let localGlitching = new Audio('assets/glitching.mp3');
 let glitchSpawnSound = new Audio('assets/glitchSpawnSound.mp3');
 let serbianRage = new Audio('assets/serbianRage.mp3');
 
+let beemsDeath = new Audio('assets/meow.mp3');
+let jollyBeemsDeath = new Audio('assets/jollyBeemsDeath.mp3');
+let bryanDeathSound = new Audio('assets/bryanDeath.mp3');
 let localDeath = new Audio('assets/localJumpscare.mp3');
 let serbianDeath = new Audio('assets/serbianDeath.mp3');
 
@@ -92,6 +95,10 @@ let serbianCharacter = new Image();
 serbianCharacter.src = "assets/serbian.png";
 let windowSerbian = new Image();
 windowSerbian.src = "assets/windowSerbian.png";
+let FPS = 120;
+let fpsDisplayInGame = 0;
+let lastTime = performance.now();
+let frameCount = 0;
 let camImgs = [cam0,cam1,cam2,cam3,cam4,cam5,cam6];
 let staticDelay = Math.random() * 600+100;
 let staticLength = 60;
@@ -111,8 +118,7 @@ let mask = false;
 let maskAnimationFrame = 0;
 let power = 100;
 let powerOutState = false;
-let nightTimer = [0,60*240];
-let nightLength = 270; // in seconds
+let nightTimer = [0,270*FPS];
 let powerConsumers = [false,false,false,false] // left door | right door | cams | flashlight
 let winState = false;
 let deathState = false;
@@ -129,7 +135,6 @@ let cam = 0;
 let frameClick = false;
 let click = false;
 let night = 0;
-let FPS = 120;
 let nightLineTimer = [7*FPS, false];
 let lineSkipTimer = [15*FPS, false];
 let nightLines = [night1Line, night2Line, night3Line, night4Line, night5Line, night6Line];
@@ -137,6 +142,8 @@ let whichCharacterReset = 0;
 let deathFrame = false;
 let nightVisuals = 0;
 let customNight = false;
+let night6Completed = false;
+let night6Completed2 = false;
 let characters = [ // 44 opacity
     ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
     ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
@@ -175,8 +182,8 @@ const eachNightDifficulty = [
     [3.0, 3.0, 2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4], // night 6
 ]
 let challenges = [
-    [[3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5,],360, 125], // 10/25
-    [[5.0, 5.0, 3.5, 5.0, 101, 6.0, 5.0, 4.0, 10.0, 4.0],600, 250], // beemathon
+    [[3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5,],360, 150], // 10/25
+    [[5.0, 5.0, 3.5, 5.0, 101, 6.0, 5.0, 4.0, 10.0, 4.0],600, 300], // beemathon
     [[2.0, 2.0, 2.0, 2.0, 0.9, 2.0, 0.9, 2.0, 0.9, 0.9],200, 100], // meows attack
     [[0.9, 0.9, 0.9, 5, 101, 11, 0.9, 0.9, 101, 0.9],120, 100] // camamask
 ];
@@ -192,7 +199,13 @@ menuMusic.loop = true;
 menuMusic.volume = 0;
 doorSound.volume = 0.5;
 staticSound.volume = 0.4;
-
+let fpsInput = document.getElementById("fpsInput");
+let fpsDisplay = document.getElementById("fpsDisplay");
+fpsInput.value = 120;
+fpsInput.addEventListener('input', (e) => {
+    fpsDisplay.innerText = `FPS: ${fpsInput.value}`;
+    FPS = fpsInput.value;
+});
 window.addEventListener('resize', function() {
     windowSize = [window.innerWidth, window.innerHeight];
     document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
@@ -296,6 +309,16 @@ function showCustomNightChallenges() {
     }
     inMenus[4] = !inMenus[4];
 }
+function thankYou() {
+    if (!inMenus[5]) {
+        document.getElementById('thankYous').classList.add('active');
+        document.getElementById('thankYous').classList.remove('close');
+    } else {
+        document.getElementById('thankYous').classList.add('close');
+        document.getElementById('thankYous').classList.remove('active');
+    }
+    inMenus[5] = !inMenus[5];
+}
 function updateMenu() {
     menuMusic.play();
     if(menuMusic.volume < 0.50) {
@@ -313,7 +336,7 @@ function updateMenu() {
         }
     }
     if (click) {
-        customNightClickSpeed[0]--;
+        customNightClickSpeed[0]-= 0.02*FPS;
     } else {
         customNightClickSpeed[0] = 0.5*FPS;
     }
@@ -433,6 +456,10 @@ function updateMenu() {
             customNightDifficulty[i] += 0.1;
         }
     }
+    if (night6Completed && !night6Completed2) {
+        night6Completed2 = true;
+        thankYou();
+    }
     frameClick = false;
 }
 function selectNight(nightSelected) {
@@ -448,7 +475,6 @@ function selectNight(nightSelected) {
     clearInterval(menuInterval);
     inGame = true;
     power = 100;
-    nightLength = 270*FPS;
     nightTimer = [0,270*FPS];
     mask = false;
     maskAnimationEnabling = false;
@@ -616,7 +642,19 @@ function resetSounds() {
     glitchSpawnSound.currentTime = 0; glitchSpawnSound.pause();
     serbianRage.currentTime = 0; serbianRage.pause();
 }
-function updateGame() {
+function updateFPS() {
+    let now = performance.now();
+    frameCount++;
+
+    if (now - lastTime >= 1000) { // 1 second has passed
+        fpsDisplayInGame = frameCount;
+        frameCount = 0;
+        lastTime = now;
+    }
+
+    return fpsDisplayInGame;
+}
+function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (effectChallengesActive[0]) {ctx.filter = 'grayscale(200%) contrast(500%) saturate(200%)';}
     if (effectChallengesActive[1]) {ctx.filter = 'sepia(1) hue-rotate(-50deg) contrast(500%) saturate(500%)';}
@@ -656,21 +694,23 @@ function updateGame() {
             }
         }
         if (mask) {
-            if (maskAnimationFrame < 15) {
-                maskAnimationFrame++;
+            if (maskAnimationFrame < 1*FPS) {
+                maskAnimationFrame+= 1000/FPS;
+            } else {
+                maskAnimationFrame = 1*FPS
             }
         } else {
             if (maskAnimationFrame > 0) {
-                maskAnimationFrame--;
+                maskAnimationFrame-= 1000/FPS;
             }
         }
         for (let i = 0; i<powerConsumers.length; i++) {
             if (powerConsumers[i] == true) {
-                power -= 0.006;
+                power -= 0.72/FPS;
             }
         }
         if (powerConsumers[3]) {
-            power += 0.003;
+            power += 0.36/FPS;
         }
         if (power <= 0 && !powerOutState) {
             powerOutage.play();
@@ -688,16 +728,13 @@ function updateGame() {
     ctx.drawImage(powerConsumers[0] ? leftDoorClosed : leftDoorOpened, -cameraX/3 + 390, 180, 296, 902);
     ctx.drawImage(powerConsumers[1] ? rightDoorClosed : rightDoorOpened, -cameraX/3 + 1864, 180, 296, 902);
     if (powerConsumers[2]) {
-        power += 0.003;
-        cameraAnimationFrame[0]++;
+        power += 0.36/FPS;
+        cameraAnimationFrame[0]+= 120/FPS;
         cameraAnimationFrame[1]++;
-        if (cameraAnimationFrame[1] === 20) {
+        if (cameraAnimationFrame[1] === 2400/FPS) {
             cameraAnimationFrame[1] = 0;
         }
-        if (effectChallengesActive[0]) {
-            cameraAnimationFrame[0]+=5;
-        }
-        if (effectChallengesActive[1]) {
+        if (effectChallengesActive[0] || effectChallengesActive[1]) {
             cameraAnimationFrame[0]+=26;
         }
         if (cameraAnimationFrame[0] < 25) {
@@ -719,12 +756,13 @@ function updateGame() {
         for (let i = 0; i<ingameCharacters.length; i++) {
             if (ingameCharacters[i][0] == "beems") {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                console.log(ingameCharacters[i][1], nightTimer[0])
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (!powerConsumers[2] && !powerConsumers[0]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
                     if (powerConsumers[0]) {
                         ingameCharacters[i][4]--;
-                        ingameCharacters[i][2]+= 1 * ingameCharacters[i][3];
+                        ingameCharacters[i][2]+= 120/FPS * ingameCharacters[i][3];
                     }
                     if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
@@ -749,7 +787,7 @@ function updateGame() {
                     if (!powerConsumers[2] && !powerConsumers[1]) {ctx.drawImage(jollyBeemsCharacter,-cameraX/3 + 1920, 488, 200, 400)}
                     if (powerConsumers[1]) {
                         ingameCharacters[i][4]--;
-                        ingameCharacters[i][2]+= 1 * ingameCharacters[i][3];
+                        ingameCharacters[i][2]+= 120/FPS * ingameCharacters[i][3];
                     }
                     if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
@@ -774,7 +812,7 @@ function updateGame() {
                     if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 477, 135, 250)}
                     if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2+67, 477+125, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
-                        ingameCharacters[i][2] += 1 * ingameCharacters[i][3];
+                        ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
                     }
                     if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
@@ -798,7 +836,7 @@ function updateGame() {
                     buzzSound.play();
                     if (mask) {
                         ingameCharacters[i][4]--;
-                        ingameCharacters[i][2]+= 1 * ingameCharacters[i][3];
+                        ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
                     }
                     if (mask && ingameCharacters[i][4] < 0) {
                         buzzSound.currentTime = 0;
@@ -846,21 +884,16 @@ function updateGame() {
                 }
             }
             if (ingameCharacters[i][0] == "zennix") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
-                if (ingameCharacters[i][1] < 0) {
-                    ingameCharacters[i][2] += (1 + ingameCharacters[i][3]/5)/8;
-                    if (powerConsumers[2] && cam == 5 && cameraAnimationFrame[0] > 25) {
-                        ctx.drawImage(zennixCharacter, canvas.width / 2 - 100 - ingameCharacters[i][2]/2,canvas.height / 2 - 250 - ingameCharacters[i][2]/2+125, 250+ingameCharacters[i][2],250+ingameCharacters[i][2]);
-                        if (powerConsumers[3] && ingameCharacters[i][2] > 0) {
-                            ingameCharacters[i][2] -= 1 * ((ingameCharacters[i][3] / 5)+1) * 5;
-                        }
+                ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
+                if (powerConsumers[2] && cam == 5 && cameraAnimationFrame[0] > 25) {
+                    ctx.drawImage(zennixCharacter, canvas.width / 2 - 100 - ingameCharacters[i][2]/2,canvas.height / 2 - 250 - ingameCharacters[i][2]/2+125, 250+ingameCharacters[i][2],250+ingameCharacters[i][2]);
+                    if (powerConsumers[3] && ingameCharacters[i][2] > 0) {
+                        ingameCharacters[i][2] -= ingameCharacters[i][3]*360/FPS;
                     }
-                    if(ingameCharacters[i][2] > 7*FPS) {
-                        buzzSound.currentTime = 0;
-                        buzzSound.pause();
-                        deathState = true;
-                        deathBy = ingameCharacters[i][0]
-                    }
+                }
+                if(ingameCharacters[i][2] > 875) {
+                    deathState = true;
+                    deathBy = ingameCharacters[i][0];
                 }
             }
             if (ingameCharacters[i][0] == "local") {
@@ -900,12 +933,10 @@ function updateGame() {
                     if (!powerConsumers[2]) {ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 600, 200, 400)}
                     if (ingameCharacters[i][5] > 2200) {ingameCharacters[i][6] = true}
                     if (ingameCharacters[i][5] < 400) {ingameCharacters[i][6] = false}
-                    if (ingameCharacters[i][6]) {ingameCharacters[i][5] -= 18} else {ingameCharacters[i][5] += 18}
+                    if (ingameCharacters[i][6]) {ingameCharacters[i][5] -= 18*120/FPS} else {ingameCharacters[i][5] += 18*120/FPS}
                     if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5]+100, 600+200, mouse.x, mouse.y) < 300) {
                         ingameCharacters[i][4]--;
-                        console.log(ingameCharacters[i][4]);
                     }
-                    ctx.fillStyle = "red";
                     if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
@@ -983,7 +1014,7 @@ function updateGame() {
         ctx.drawImage(fog1,0, 0, canvas.width, canvas.height);
     }
     if (powerConsumers[3]) {ctx.drawImage(flashlightGlow,cameraX-250,cameraY-250,500,500);}
-    ctx.drawImage(maskImg,0,-1080 + maskAnimationFrame*(1080/15),1920,1080);
+    ctx.drawImage(maskImg,0,-1080 + maskAnimationFrame*(1080/FPS),1920,1080);
     if (power <= 0) {
         ctx.drawImage(powerOutageDarkness,0,0,canvas.width,canvas.height);
     }
@@ -991,13 +1022,16 @@ function updateGame() {
         blackBgTransparency[1]++;
         if (blackBgTransparency[1] > 3) {
             if (blackBgTransparency[0] > 0.01) {
-                blackBgTransparency[0] -= 0.01;
+                blackBgTransparency[0] -= 1.5/FPS;
             }
             blackBgTransparency[1] = 0
         }
         if (blackBgTransparency[0] < 0.01 && bellSoundAnimationFrame[0] > 0.01) {
             if (bellSoundAnimationFrame[2] == false) {
                 bellSound.play();
+                if (night == 6) {
+                    night6Completed = true;
+                }
                 bellSoundAnimationFrame[2] = true;
             }
             bellSoundAnimationFrame[1]++;
@@ -1016,10 +1050,12 @@ function updateGame() {
             }
             ctx.globalAlpha = 1.0;
         }
-        ctx.fillStyle = "black";
-        ctx.globalAlpha = blackBgTransparency[0];
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 1.0;
+        if (blackBgTransparency[0] > 0) {
+            ctx.fillStyle = "black"; 
+            ctx.globalAlpha = blackBgTransparency[0];
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 1.0;
+        }
     }
     if (!customNight) {
         nightLineTimer[0]--;
@@ -1048,7 +1084,9 @@ function updateGame() {
     }
     ctx.fillStyle = "white";
     ctx.font = "bold 75px FnafFont";
+    updateFPS();
     ctx.fillText(`Power: ${power.toFixed(1)}%`, 30, 1000);
+    ctx.fillText(`FPS: ${(fpsDisplayInGame/1.05).toFixed(0)}`, 30, 925);
     if (night == 7) {
         ctx.fillText(`${(nightTimer[0]/nightTimer[1]*6).toFixed(4)}AM`, 30, 1100);
     } else {
@@ -1061,7 +1099,7 @@ function updateGame() {
         sixAM.play();
         if (blackBgTransparency[0] < 1) {
             blackBgTransparency[1]++;
-            if (blackBgTransparency[1] >= 4) {
+            if (blackBgTransparency[1] >= 0.1*FPS) {
                 blackBgTransparency[0]+=0.01;
                 blackBgTransparency[1] = 0;
             }
@@ -1085,34 +1123,37 @@ function updateGame() {
     if (deathState) {
         if(deathBy == "beems") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*60) { 
+            if (deathAnimationTimer >= 1.2*FPS) { 
                 backMainMenu();
             } else {
+                beemsDeath.play();
                 ctx.drawImage(beemsCharacter,0,0,canvas.width,canvas.height);
                 resetSounds();
             }
         }
         if(deathBy == "jolly beems") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*60) { 
+            if (deathAnimationTimer >= 1.2*FPS) { 
                 backMainMenu();
             } else {
+                jollyBeemsDeath.play();
                 ctx.drawImage(jollyBeemsCharacter,0,0,canvas.width,canvas.height);
                 resetSounds();
             }
         }
         if(deathBy == "bryan") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*60) { 
+            if (deathAnimationTimer >= 1.6*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(bryanDeath,0,0,canvas.width,canvas.height);
                 resetSounds();
+                bryanDeathSound.play();
             }
         }
         if(deathBy == "jane") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*60) { 
+            if (deathAnimationTimer >= 1.5*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(janeCharacter,0,0,canvas.width,canvas.height);
@@ -1121,7 +1162,7 @@ function updateGame() {
         }
         if(deathBy == "bubzeee") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*60) { 
+            if (deathAnimationTimer >= 1.5*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(bubzeeeCharacter,0,0,canvas.width,canvas.height);
@@ -1130,7 +1171,7 @@ function updateGame() {
         }
         if(deathBy == "zennix") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*60) { 
+            if (deathAnimationTimer >= 1.5*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(zennixCharacter,0,0,canvas.width,canvas.height);
@@ -1139,7 +1180,7 @@ function updateGame() {
         }
         if(deathBy == "noah") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*60) { 
+            if (deathAnimationTimer >= 1.5*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(noahCharacter,0,0,canvas.width,canvas.height);
@@ -1148,7 +1189,7 @@ function updateGame() {
         }
         if(deathBy == "local") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3.4*60) { 
+            if (deathAnimationTimer >= 1.5*FPS) { 
                 backMainMenu();
             } else {
                 if (!deathFrame) {
@@ -1161,7 +1202,7 @@ function updateGame() {
         }
         if(deathBy == "glitch") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*60) { 
+            if (deathAnimationTimer >= 3*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(glitchCharacter,0,0,canvas.width,canvas.height);
@@ -1170,7 +1211,7 @@ function updateGame() {
         }
         if(deathBy == "serbian") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 1.9*60) { 
+            if (deathAnimationTimer >= 1*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(serbianCharacter,0,0,canvas.width,canvas.height);

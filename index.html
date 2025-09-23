@@ -16,9 +16,11 @@
             <button id="customNightButton" onclick="customNightOpen()">Custom Night</button>
         </div>
         <div id="settings">
-            Speedhack (not implemented yet)
-            <div id="speedhackDisplay">1.0x</div>
+            <div id="speedhackDisplay">Speedhack: 1.0x</div>
             <input id="speedhackSlider" type="range" min="5" max="30" value="10">
+            <br>
+            <div id="fpsDisplay">FPS: 120</div>
+            <input id="fpsInput" type="input">
         </div>
         <div id="credits">
             <h1>Credits</h1>
@@ -46,6 +48,14 @@
             <button id="challenge1" style="font-size: 2.3vw;" onclick="challengesSelect(1)">BEEMATHON</button>
             <button id="challenge2" style="font-size: 1.2vw;" onclick="challengesSelect(2)">Meows Attack</button>
             <button id="challenge3" style="font-size: 1.2vw;" onclick="challengesSelect(3)">Camamask</button>
+        </div>
+        <div id="thankYous">
+            <h1>thank you for playing FNaB2</h1>
+            <h2>i really hope you enjoyed playing this hot garbage of a game</h2>
+            <h2>and we want you to continue playing this game</h2>
+            <h2>there is an entire custom night waiting for you</h2>
+            <h3>good luck....</h3>
+            <button onclick="thankYou();">Close</button>
         </div>
     </div>
     <canvas id="gameCanvas" width="1920" height="1080"></canvas>
