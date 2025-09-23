@@ -884,7 +884,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 }
             }
             if (ingameCharacters[i][0] == "zennix") {
-                ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
+                ingameCharacters[i][2] += 20/FPS * ingameCharacters[i][3];
                 if (powerConsumers[2] && cam == 5 && cameraAnimationFrame[0] > 25) {
                     ctx.drawImage(zennixCharacter, canvas.width / 2 - 100 - ingameCharacters[i][2]/2,canvas.height / 2 - 250 - ingameCharacters[i][2]/2+125, 250+ingameCharacters[i][2],250+ingameCharacters[i][2]);
                     if (powerConsumers[3] && ingameCharacters[i][2] > 0) {
