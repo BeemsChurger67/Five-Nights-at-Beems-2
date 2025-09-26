@@ -144,6 +144,7 @@ let nightVisuals = 0;
 let customNight = false;
 let night6Completed = false;
 let night6Completed2 = false;
+let firstCharacterTick = false;
 let characters = [ // 44 opacity
     ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
     ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
@@ -225,10 +226,6 @@ window.addEventListener("mouseup", (e) => {
 })
 window.addEventListener('keyup', (e) => {
     keys[e.code] = false;
-})
-document.getElementById('speedhackSlider').addEventListener('input', () => {
-    speedhack = document.getElementById('speedhackSlider').value;
-    document.getElementById('speedhackDisplay').innerText = Math.round(speedhack)/10 + "x";
 })
 canvas.addEventListener('mousemove', function(event) {
     if (inGame) {
@@ -472,6 +469,7 @@ function selectNight(nightSelected) {
     document.getElementById('credits').classList.remove('active');
     inMenus[0] = false;
     inMenus[1] = false;
+    firstCharacterTick = false;
     clearInterval(menuInterval);
     inGame = true;
     power = 100;
@@ -548,6 +546,7 @@ function startCustomNight() {
     inMenus[0] = false;
     inMenus[1] = false;
     clearInterval(menuInterval);
+    firstCharacterTick = false;
     night = Infinity;
     inGame = true;
     power = customNightPower;
@@ -655,6 +654,7 @@ function updateFPS() {
     return fpsDisplayInGame;
 }
 function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    console.log(ingameCharacters);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (effectChallengesActive[0]) {ctx.filter = 'grayscale(200%) contrast(500%) saturate(200%)';}
     if (effectChallengesActive[1]) {ctx.filter = 'sepia(1) hue-rotate(-50deg) contrast(500%) saturate(500%)';}
@@ -753,16 +753,25 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         }
     }
     if (!deathState && !winState) {
+        if (!firstCharacterTick) {
+            for (let a = 0; a<ingameCharacters.length; a++) {
+                for (let b = 0; b<characters.length; b++) {
+                    if (ingameCharacters[a][0] == characters[b][0]) {
+                        ingameCharacters[a] = characters[b];
+                    }
+                }
+            }
+        }
+        firstCharacterTick = true;
         for (let i = 0; i<ingameCharacters.length; i++) {
             if (ingameCharacters[i][0] == "beems") {
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
-                console.log(ingameCharacters[i][1], nightTimer[0])
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (!powerConsumers[2] && !powerConsumers[0]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
                     if (powerConsumers[0]) {
                         ingameCharacters[i][4]--;
-                        ingameCharacters[i][2]+= 120/FPS * ingameCharacters[i][3];
+                        ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
                     }
                     if (ingameCharacters[i][4] < 0) {
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
@@ -809,7 +818,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 477, 135, 250)}
+                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 457, 135, 270)}
                     if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2+67, 477+125, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
