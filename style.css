@@ -10,6 +10,12 @@
     font-weight: bold;
     font-style: normal; 
 }
+@font-face {
+    font-family: "InGameFont";
+    src: url("assets/intenseFont.otf") format("opentype");
+    font-weight: bold;
+    font-style: normal; 
+}
 button {
     font-family: "FnafFont", sans-serif;
     color: white;

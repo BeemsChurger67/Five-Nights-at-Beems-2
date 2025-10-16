@@ -17,6 +17,8 @@ let serbianRage = new Audio('assets/serbianRage.mp3');
 let beemsDeath = new Audio('assets/meow.mp3');
 let jollyBeemsDeath = new Audio('assets/jollyBeemsDeath.mp3');
 let bryanDeathSound = new Audio('assets/bryanDeath.mp3');
+let janeDeath = new Audio('assets/janeDeath.mp3');
+let bubzeeeDeath = new Audio('assets/bubzeeeDeath.mp3');
 let localDeath = new Audio('assets/localJumpscare.mp3');
 let serbianDeath = new Audio('assets/serbianDeath.mp3');
 
@@ -26,6 +28,9 @@ let night3Line = new Audio('assets/night3Line.mp3');
 let night4Line = new Audio('assets/night4Line.mp3');
 let night5Line = new Audio('assets/night5Line.mp3');
 let night6Line = new Audio('assets/night6Line.mp3');
+
+let challenge1Theme = new Audio('assets/challenge1Theme.mp3');
+challenge1Theme.volume = 0.5;
 
 let office = new Image();
 office.src = 'assets/office.png';
@@ -145,18 +150,7 @@ let customNight = false;
 let night6Completed = false;
 let night6Completed2 = false;
 let firstCharacterTick = false;
-let characters = [ // 44 opacity
-    ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
-    ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
-    ["bryan", Math.random() * 20*FPS + 10*FPS, 7*FPS, 1, 1*FPS],
-    ["jane", Math.random() * 20*FPS + 10*FPS, 2*FPS, 1, 0.5*FPS],
-    ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 2 + 2),false], // wigCam | wigTaken
-    ["zennix", 0, 0, 1, 999999*FPS],
-    ["local", 0, 1.5*FPS, 1, 0, false], // active
-    ["noah", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.25*FPS,401,false], // x | side
-    ["glitch", Math.random() * 20*FPS + 10*FPS,10*FPS,1,0, Math.round(Math.random()*2)], // cam
-    ["serbian", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.75*FPS],
-]
+characters = []
 let ingameCharacters = [];
 let customNightImages = [
     beemsCharacter,
@@ -176,17 +170,17 @@ const cnCanvas = document.getElementById('customNight');
 const cnCtx = cnCanvas.getContext('2d');
 const eachNightDifficulty = [
     [1.0, 1.0], // night 1
-    [1.4, 1.4, 1.0, 1.0], // night 2
-    [1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 3
-    [2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 4
-    [2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 1.0, 1.0], // night 5
-    [3.0, 3.0, 2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4], // night 6
+    [1.4, 1.4, 0.7, 0.7], // night 2
+    [1.8, 1.8, 1.4, 1.4, 0.7, 0.7], // night 3
+    [2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 0.7, 0.7], // night 4
+    [2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 0.7, 0.7], // night 5
+    [5.0, 5.0, 2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4], // night 6
 ]
 let challenges = [
-    [[3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5,],360, 150], // 10/25
+    [[3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5],360, 150], // 10/25
     [[5.0, 5.0, 3.5, 5.0, 101, 6.0, 5.0, 4.0, 10.0, 4.0],600, 300], // beemathon
     [[2.0, 2.0, 2.0, 2.0, 0.9, 2.0, 0.9, 2.0, 0.9, 0.9],200, 100], // meows attack
-    [[0.9, 0.9, 0.9, 5, 101, 11, 0.9, 0.9, 101, 0.9],120, 100] // camamask
+    [[0.9, 0.9, 0.9, 5, 101, 101, 0.9, 0.9, 101, 0.9],120, 100] // camamask
 ];
 let customNightClickSpeed = [120,20];
 let customNightA = [0,0];
@@ -241,14 +235,14 @@ cnCanvas.addEventListener('mousemove', function(event) {
 })
 function resetCharacters() {
     characters = [ // 44 opacity
-        ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS ,0],
-        ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS, 0],
-        ["bryan", Math.random() * 20*FPS + 10*FPS, 7*FPS, 1, 1*FPS],
-        ["jane", Math.random() * 20*FPS + 10*FPS, 2*FPS, 1, 0.5*FPS],
+        ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS,0], // animation
+        ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS,0], // animation
+        ["bryan", Math.random() * 20*FPS + 10*FPS, 7*FPS, 1, 1*FPS,0], // animation
+        ["jane", Math.random() * 20*FPS + 10*FPS, 2*FPS, 1, 0.5*FPS, 0], // glitchAnimation
         ["bubzeee", Math.random() * 20*FPS + 10*FPS, 10*FPS, 1, Math.round(Math.random() * 2 + 2),false], // wigCam | wigTaken
         ["zennix", 0, 0, 1, 999999*FPS],
         ["local", 0, 1.5*FPS, 1, 0, false], // active
-        ["noah", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.25*FPS,401,false], // x | side
+        ["noah", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.25*FPS,401,false,0], // x | side | animation
         ["glitch", Math.random() * 20*FPS + 10*FPS,10*FPS,1,0, Math.round(Math.random()*2)], // cam
         ["serbian", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.75*FPS],
     ]
@@ -327,8 +321,8 @@ function updateMenu() {
         staticSound.play();
         document.body.style.backgroundImage = "url('assets/mainMenuStatic.gif')";
         if (staticLength < 0) {
-            staticDelay = Math.random() * 600+100;
-            staticLength = 60;
+            staticDelay = Math.random() * 300+50;
+            staticLength = 30;
             document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
         }
     }
@@ -579,6 +573,7 @@ function startCustomNight() {
     effectChallengesActive[1] = false;
     if (isCustomNightMatchingChallenge(0)) {
         effectChallengesActive[0] = true;
+        challenge1Theme.play();
     }
     if (isCustomNightMatchingChallenge(1)) {
         effectChallengesActive[1] = true;
@@ -640,6 +635,7 @@ function resetSounds() {
     thankYouKindSir.currentTime = 0; thankYouKindSir.pause();
     glitchSpawnSound.currentTime = 0; glitchSpawnSound.pause();
     serbianRage.currentTime = 0; serbianRage.pause();
+    challenge1Theme.currentTime = 0; challenge1Theme.pause();
 }
 function updateFPS() {
     let now = performance.now();
@@ -765,10 +761,15 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         firstCharacterTick = true;
         for (let i = 0; i<ingameCharacters.length; i++) {
             if (ingameCharacters[i][0] == "beems") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1] -= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2] && !powerConsumers[0]) {ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400)}
+                    if (ingameCharacters[i][5] < 0.99) {ingameCharacters[i][5] += 0.01;}
+                    if (!powerConsumers[2] && !powerConsumers[0]) {
+                        ctx.globalAlpha = ingameCharacters[i][5];
+                        ctx.drawImage(beemsCharacter,-cameraX/3 + 430, 488, 200, 400);
+                        ctx.globalAlpha = 1;
+                    }
                     if (powerConsumers[0]) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
@@ -777,7 +778,8 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
                         ingameCharacters[i][4] = 0.5*FPS;
-                        beemsLeave.pause(); 
+                        ingameCharacters[i][5] = 0;
+                        beemsLeave.pause();
                         beemsLeave.currentTime = 0;
                         beemsLeave.play();
                     }
@@ -790,10 +792,15 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 }
             }
             if (ingameCharacters[i][0] == "jolly beems") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1] -= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2] && !powerConsumers[1]) {ctx.drawImage(jollyBeemsCharacter,-cameraX/3 + 1920, 488, 200, 400)}
+                    if (ingameCharacters[i][5] < 0.99) {ingameCharacters[i][5] += 0.01;}
+                    if (!powerConsumers[2] && !powerConsumers[1]) {
+                        ctx.globalAlpha = ingameCharacters[i][5];
+                        ctx.drawImage(jollyBeemsCharacter,-cameraX/3 + 1920, 488, 200, 400);
+                        ctx.globalAlpha = 1;
+                    }
                     if (powerConsumers[1]) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2]+= 120/FPS * ingameCharacters[i][3];
@@ -802,6 +809,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
                         ingameCharacters[i][2] = 10*FPS;
                         ingameCharacters[i][4] = 0.5*FPS;
+                        ingameCharacters[i][5] = 0;
                         beemsLeave.pause(); 
                         beemsLeave.currentTime = 0;
                         beemsLeave.play();
@@ -815,10 +823,15 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 }
             }
             if (ingameCharacters[i][0] == "bryan") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1] -= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 457, 135, 270)}
+                    if (ingameCharacters[i][5] < 0.99) {ingameCharacters[i][5] += 0.01;}
+                    if (!powerConsumers[2] && !powerConsumers[0]) {
+                        ctx.globalAlpha = ingameCharacters[i][5];
+                        ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 457, 135, 270)
+                        ctx.globalAlpha = 1;
+                    }
                     if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2+67, 477+125, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
@@ -838,16 +851,21 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 }
             }
             if (ingameCharacters[i][0] == "jane") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1] -= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ((ingameCharacters[i][3] / 5)+1);
-                    if (!powerConsumers[2]) {ctx.drawImage(janeCharacter,-cameraX/3 + 2560/2-250/2, 500, 250, 350)}
+                    if (!powerConsumers[2]) {
+                        ctx.globalAlpha = Math.random();
+                        ctx.drawImage(janeCharacter,-cameraX/3 + 2560/2-250/2, 500, 250, 350)
+                        ctx.globalAlpha = 1;
+                    }
                     buzzSound.play();
                     if (mask) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
                     }
                     if (mask && ingameCharacters[i][4] < 0) {
+                        ctx.globalAlpha = 1;
                         buzzSound.currentTime = 0;
                         buzzSound.pause();
                         ingameCharacters[i][1] = Math.random() * 20*FPS + 10*FPS;
@@ -856,8 +874,10 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                         beemsLeave.pause();
                         beemsLeave.currentTime = 0;
                         beemsLeave.play();
+                        
                     }
                     if(ingameCharacters[i][2] < 0) {
+                        ctx.globalAlpha = 1;
                         buzzSound.currentTime = 0;
                         buzzSound.pause();
                         deathState = true;
@@ -866,7 +886,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 }
             }
             if (ingameCharacters[i][0] == "bubzeee") {
-                ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1] -= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1;
                     bubzeeeLocate.play();
@@ -914,7 +934,9 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                         }
                     }
                     if (ingameCharacters[i][4]) {
+                        ctx.globalAlpha = Math.random() * 0.5 + 0.5;
                         ctx.drawImage(localCharacter,-cameraX/3 + canvas.width/2+400, canvas.height/2+130, 300, 400);
+                        ctx.globalAlpha = 1;
                         ingameCharacters[i][2]-= 1 * ((ingameCharacters[i][3]/5)+1);
                         localGlitching.play();
                     }
@@ -939,7 +961,12 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 ingameCharacters[i][1]-= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
-                    if (!powerConsumers[2]) {ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 600, 200, 400)}
+                    if (ingameCharacters[i][7] < 0.99) {ingameCharacters[i][7] += 0.01;}
+                    if (!powerConsumers[2] && !powerConsumers[0]) {
+                        ctx.globalAlpha = ingameCharacters[i][7];
+                        ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 600, 200, 400);
+                        ctx.globalAlpha = 1;
+                    }
                     if (ingameCharacters[i][5] > 2200) {ingameCharacters[i][6] = true}
                     if (ingameCharacters[i][5] < 400) {ingameCharacters[i][6] = false}
                     if (ingameCharacters[i][6]) {ingameCharacters[i][5] -= 18*120/FPS} else {ingameCharacters[i][5] += 18*120/FPS}
@@ -952,6 +979,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                         ingameCharacters[i][4] = 0.25*FPS;
                         ingameCharacters[i][5] = 300;
                         ingameCharacters[i][6] = false;
+                        ingameCharacters[i][7] = 0;
                         beemsLeave.pause(); 
                         beemsLeave.currentTime = 0;
                         beemsLeave.play();
@@ -1097,7 +1125,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
     ctx.fillText(`Power: ${power.toFixed(1)}%`, 30, 1000);
     ctx.fillText(`FPS: ${(fpsDisplayInGame/1.05).toFixed(0)}`, 30, 925);
     if (night == 7) {
-        ctx.fillText(`${(nightTimer[0]/nightTimer[1]*6).toFixed(4)}AM`, 30, 1100);
+        ctx.fillText(`${(nightTimer[0]/nightTimer[1]*6).toFixed(2)}AM`, 30, 1100);
     } else {
         ctx.fillText(`${Math.round((nightTimer[0]/nightTimer[1]*6)-0.5)}AM`, 30, 1100);
     }
@@ -1162,18 +1190,20 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         }
         if(deathBy == "jane") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 1.5*FPS) { 
+            if (deathAnimationTimer >= 0.7*FPS) { 
                 backMainMenu();
             } else {
+                janeDeath.play();
                 ctx.drawImage(janeCharacter,0,0,canvas.width,canvas.height);
                 resetSounds();
             }
         }
         if(deathBy == "bubzeee") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 1.5*FPS) { 
+            if (deathAnimationTimer >= 1.5*FPS) {
                 backMainMenu();
             } else {
+                bubzeeeDeath.play();
                 ctx.drawImage(bubzeeeCharacter,0,0,canvas.width,canvas.height);
                 resetSounds();
             }
@@ -1198,7 +1228,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         }
         if(deathBy == "local") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 1.5*FPS) { 
+            if (deathAnimationTimer >= 1.8*FPS) {
                 backMainMenu();
             } else {
                 if (!deathFrame) {
@@ -1237,7 +1267,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
 function updateLoad() {
     loadInTimer--;
     if (loadInTimer < 0) {
-        menuInterval = setInterval(updateMenu, 1000/FPS);
+        menuInterval = setInterval(updateMenu, 1000/60);
         clearInterval(loadInterval);
     }
 }
