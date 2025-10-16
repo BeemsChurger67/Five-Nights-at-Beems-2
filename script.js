@@ -827,12 +827,12 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (ingameCharacters[i][5] < 0.99) {ingameCharacters[i][5] += 0.01;}
-                    if (!powerConsumers[2] && !powerConsumers[0]) {
+                    if (!powerConsumers[2]) {
                         ctx.globalAlpha = ingameCharacters[i][5];
-                        ctx.drawImage(bryanCharacter,-cameraX/3 + canvas.width/2, 457, 135, 270)
+                        ctx.drawImage(bryanCharacter,-cameraX/3 + 1450, 457, 135, 270);
                         ctx.globalAlpha = 1;
                     }
-                    if (powerConsumers[3] && distance(-cameraX/3 + canvas.width/2+67, 477+125, mouse.x, mouse.y) < 200) {
+                    if (powerConsumers[3] && distance(-cameraX/3 + 1450+67, 477+135, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
                     }
@@ -1124,7 +1124,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
     updateFPS();
     ctx.fillText(`Power: ${power.toFixed(1)}%`, 30, 1000);
     ctx.fillText(`FPS: ${(fpsDisplayInGame/1.05).toFixed(0)}`, 30, 925);
-    if (night == 7) {
+    if (effectChallengesActive[0] || effectChallengesActive[1]) {
         ctx.fillText(`${(nightTimer[0]/nightTimer[1]*6).toFixed(2)}AM`, 30, 1100);
     } else {
         ctx.fillText(`${Math.round((nightTimer[0]/nightTimer[1]*6)-0.5)}AM`, 30, 1100);
