@@ -174,7 +174,7 @@ const cnCtx = cnCanvas.getContext('2d');
 const eachNightDifficulty = [
     [1.0, 1.0], // night 1
     [1.4, 1.4, 0.7, 0.7], // night 2
-    [1.8, 1.8, 1.4, 1.4, 0.7, 0.7], // night 3
+    [1.8, 1.8, 1.4, 1.4, 0.7, 0.7], // night 3 
     [2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 0.7, 0.7], // night 4
     [2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4, 0.7, 0.7], // night 5
     [5.0, 5.0, 2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4], // night 6
@@ -701,6 +701,20 @@ function cheatsFunc() {
     for (let i = 0; i<7; i++) {
         nextNightUnlock(i);
     }
+}
+function resetProgress() {
+    const data = {
+        completedPreviousNight : 1,
+        night6Completed : false,
+        night6Completed2 : false
+    };
+    try {
+        localStorage.setItem('fnaf2_progress', JSON.stringify(data));
+    } catch (e) {
+        console.warn('saveProgress failed', e);
+    }
+    applyProgressToUI();
+    location.reload();
 }
 function saveProgress() {
     const data = {

@@ -220,8 +220,14 @@ button {
 }
 #cheatButton {
     position: fixed;
-    bottom: 5px;
-    left: 5px;
+    bottom: 0px;
+    left: 0px;
+    font-size: 6px;
+}
+#resetButton {
+    position: fixed;
+    bottom: 15px;
+    left: 0;
     font-size: 6px;
 }
 #gameCanvas {
