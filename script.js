@@ -825,7 +825,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 }
             }
             if (ingameCharacters[i][0] == "bryan") {
-                ingameCharacters[i][1] -= 1243.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1] -= 0.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (ingameCharacters[i][5] < 0.99) {ingameCharacters[i][5] += 0.01;}
