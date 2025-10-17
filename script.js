@@ -114,6 +114,7 @@ let inGame = false;
 let inMenus = [false, false, false, false, false, false, false]; // night selector | credits | settings | custom night
 let menuInterval = null;
 let gameInterval = null;
+let timePlayedInterval = null;
 let mouse = {x: 0, y: 0};
 let cnMouse = {x: 0, y: 0};
 let inCamera = false;
@@ -153,6 +154,7 @@ let night6Completed = false;
 let night6Completed2 = false;
 let firstCharacterTick = false;
 let completedPreviousNight = 1;
+let totalTimePlayed = 0;
 let ingameTime = 0;
 let deathCounter = 0;
 characters = []
@@ -713,6 +715,7 @@ function resetProgress() {
         night6Completed : false,
         night6Completed2 : false,
         deathCounter,
+        totalTimePlayed,
         ingameTime
     };
     try {
@@ -724,13 +727,7 @@ function resetProgress() {
     completedPreviousNight = 1;
     night6Completed = false;
     night6Completed2 = false;
-    deathCounter = 0;
-    ingameTime = 0;
     applyProgressToUI();
-    const deathEl = document.getElementById('deathCounterDiv');
-    if (deathEl) deathEl.innerText = `Deaths: ${deathCounter}`;
-    const timeEl = document.getElementById('timePlayedDiv');
-    if (timeEl) timeEl.innerText = `Time Played: ${ingameTime.toFixed(1)}s`;
     location.reload();
 }
 function saveProgress() {
@@ -739,6 +736,7 @@ function saveProgress() {
         night6Completed,
         night6Completed2,
         deathCounter,
+        totalTimePlayed,
         ingameTime
     };
     try {
@@ -780,12 +778,11 @@ function loadProgress() {
         night6Completed2 = !!data.night6Completed2;
         // restore deaths and time
         if (typeof data.deathCounter === 'number') deathCounter = data.deathCounter;
+        if (typeof data.totalTimePlayed === 'number') totalTimePlayed = data.totalTimePlayed;
         if (typeof data.ingameTime === 'number') ingameTime = data.ingameTime;
         applyProgressToUI();
         const deathEl = document.getElementById('deathCounterDiv');
         if (deathEl) deathEl.innerText = `Deaths: ${deathCounter}`;
-        const timeEl = document.getElementById('timePlayedDiv');
-        if (timeEl) timeEl.innerText = `Time Played: ${ingameTime.toFixed(1)}s`;
     } catch (e) {
         console.warn('loadProgress failed', e);
     }
@@ -1308,6 +1305,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
             document.getElementById('deathCounterDiv').innerHTML = `Deaths: ${deathCounter}`;
             saveProgress();
             deathTick = false;
+            inGame = false;
         }
         if(deathBy == "beems") {
             deathAnimationTimer++;
@@ -1434,10 +1432,14 @@ function formatTime(totalSeconds) {
     if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     return `${m}:${String(s).padStart(2,'0')}`;
 }
-setInterval(() => {
-    ingameTime += 1 / FPS;
-    document.getElementById('timePlayedDiv').innerHTML = `Time Played: ${formatTime(ingameTime)}`;
-}, 1000 / FPS);
+function playedTimeUpdate() {
+    totalTimePlayed += 1 / 60;
+    if (inGame) {ingameTime += 1 / 60;}
+    document.getElementById('timePlayedDiv').innerHTML = `Total Time: ${formatTime(totalTimePlayed)}`;
+    document.getElementById('ingameTimePlayedDiv').innerHTML = `Ingame Time: ${formatTime(ingameTime)}`;
+}
+timePlayedInterval = setInterval(playedTimeUpdate, 1000 / 60);
+
 setInterval(() => {
     saveProgress();
 }, 10000);
