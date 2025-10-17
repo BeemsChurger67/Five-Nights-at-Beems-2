@@ -713,7 +713,6 @@ function resetProgress() {
     } catch (e) {
         console.warn('saveProgress failed', e);
     }
-    applyProgressToUI();
     location.reload();
 }
 function saveProgress() {
