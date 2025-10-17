@@ -19,7 +19,9 @@ let jollyBeemsDeath = new Audio('assets/jollyBeemsDeath.mp3');
 let bryanDeathSound = new Audio('assets/bryanDeath.mp3');
 let janeDeath = new Audio('assets/janeDeath.mp3');
 let bubzeeeDeath = new Audio('assets/bubzeeeDeath.mp3');
+let zennixDeath = new Audio('assets/zennixDeath.mp3');
 let localDeath = new Audio('assets/localJumpscare.mp3');
+let noahDeath = new Audio('assets/noahDeath.mp3');
 let serbianDeath = new Audio('assets/serbianDeath.mp3');
 
 let night1Line = new Audio('assets/night1Line.mp3');
@@ -1210,19 +1212,21 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         }
         if(deathBy == "zennix") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 1.5*FPS) { 
+            if (deathAnimationTimer >= 1*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(zennixCharacter,0,0,canvas.width,canvas.height);
+                zennixDeath.play();
                 resetSounds();
             }
         }
         if(deathBy == "noah") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 1.5*FPS) { 
+            if (deathAnimationTimer >= 0.7*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(noahCharacter,0,0,canvas.width,canvas.height);
+                noahDeath.play();
                 resetSounds();
             }
         }
