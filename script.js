@@ -825,16 +825,16 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 }
             }
             if (ingameCharacters[i][0] == "bryan") {
-                ingameCharacters[i][1] -= 0.5 * ingameCharacters[i][3];
+                ingameCharacters[i][1] -= 1243.5 * ingameCharacters[i][3];
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (ingameCharacters[i][5] < 0.99) {ingameCharacters[i][5] += 0.01;}
                     if (!powerConsumers[2]) {
                         ctx.globalAlpha = ingameCharacters[i][5];
-                        ctx.drawImage(bryanCharacter,-cameraX/3 + 1450, 457, 135, 270);
+                        ctx.drawImage(bryanCharacter,-cameraX/3 + 1330, 457, 135, 270);
                         ctx.globalAlpha = 1;
                     }
-                    if (powerConsumers[3] && distance(-cameraX/3 + 1450+67, 477+135, mouse.x, mouse.y) < 200) {
+                    if (powerConsumers[3] && distance(-cameraX/3 + 1330+67, 477+135, mouse.x, mouse.y) < 200) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
                     }
