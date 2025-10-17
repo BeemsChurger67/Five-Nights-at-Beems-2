@@ -153,6 +153,8 @@ let night6Completed = false;
 let night6Completed2 = false;
 let firstCharacterTick = false;
 let completedPreviousNight = 1;
+let ingameTime = 0;
+let deathCounter = 0;
 characters = []
 let ingameCharacters = [];
 let customNightImages = [
@@ -192,6 +194,7 @@ let customNightPower = 100;
 let effectChallengesActive = [false,false];
 let customNightDifficulty = [0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9];
 let winTick = true;
+let deathTick = false;
 document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
 document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
 menuMusic.loop = true;
@@ -500,6 +503,7 @@ function nextNightUnlock(nightCompleted) {
     }
 }
 function selectNight(nightSelected) {
+    deathTick = true;
     winTick = true;
     menuMusic.volume = 0;
     document.getElementById('gameCanvas').style.display = 'block';
@@ -514,7 +518,7 @@ function selectNight(nightSelected) {
     clearInterval(menuInterval);
     inGame = true;
     power = 100;
-    nightTimer = [0,270*FPS]; // dgafsafdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsafsddddddddddddddddfadsdsdsdsdsdsdsdsdsdsdsdsdsadfsedfasasasasasasasasasasasasas
+    nightTimer = [0,270*FPS];
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
@@ -576,6 +580,7 @@ function challengesSelect(challengeId) {
 }
 let a = 0;
 function startCustomNight() {
+    deathTick = true;
     winTick = true;
     customNight = true;
     menuMusic.volume = 0;
@@ -706,20 +711,35 @@ function resetProgress() {
     const data = {
         completedPreviousNight : 1,
         night6Completed : false,
-        night6Completed2 : false
+        night6Completed2 : false,
+        deathCounter,
+        ingameTime
     };
     try {
         localStorage.setItem('fnaf2_progress', JSON.stringify(data));
     } catch (e) {
         console.warn('saveProgress failed', e);
     }
+    // update runtime state and UI immediately
+    completedPreviousNight = 1;
+    night6Completed = false;
+    night6Completed2 = false;
+    deathCounter = 0;
+    ingameTime = 0;
+    applyProgressToUI();
+    const deathEl = document.getElementById('deathCounterDiv');
+    if (deathEl) deathEl.innerText = `Deaths: ${deathCounter}`;
+    const timeEl = document.getElementById('timePlayedDiv');
+    if (timeEl) timeEl.innerText = `Time Played: ${ingameTime.toFixed(1)}s`;
     location.reload();
 }
 function saveProgress() {
     const data = {
         completedPreviousNight,
         night6Completed,
-        night6Completed2
+        night6Completed2,
+        deathCounter,
+        ingameTime
     };
     try {
         localStorage.setItem('fnaf2_progress', JSON.stringify(data));
@@ -758,7 +778,14 @@ function loadProgress() {
         if (typeof data.completedPreviousNight === 'number') completedPreviousNight = data.completedPreviousNight;
         night6Completed = !!data.night6Completed;
         night6Completed2 = !!data.night6Completed2;
+        // restore deaths and time
+        if (typeof data.deathCounter === 'number') deathCounter = data.deathCounter;
+        if (typeof data.ingameTime === 'number') ingameTime = data.ingameTime;
         applyProgressToUI();
+        const deathEl = document.getElementById('deathCounterDiv');
+        if (deathEl) deathEl.innerText = `Deaths: ${deathCounter}`;
+        const timeEl = document.getElementById('timePlayedDiv');
+        if (timeEl) timeEl.innerText = `Time Played: ${ingameTime.toFixed(1)}s`;
     } catch (e) {
         console.warn('loadProgress failed', e);
     }
@@ -1276,6 +1303,12 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
     }
     ctx.filter = 'none';
     if (deathState) {
+        if (deathTick) {
+            deathCounter++;
+            document.getElementById('deathCounterDiv').innerHTML = `Deaths: ${deathCounter}`;
+            saveProgress();
+            deathTick = false;
+        }
         if(deathBy == "beems") {
             deathAnimationTimer++;
             if (deathAnimationTimer >= 1.2*FPS) { 
@@ -1393,3 +1426,18 @@ function updateLoad() {
     }
 }
 let loadInterval = setInterval(updateLoad, 1000/FPS);
+function formatTime(totalSeconds) {
+    const secs = Math.max(0, Math.floor(totalSeconds));
+    const s = secs % 60;
+    const m = Math.floor(secs / 60) % 60;
+    const h = Math.floor(secs / 3600);
+    if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    return `${m}:${String(s).padStart(2,'0')}`;
+}
+setInterval(() => {
+    ingameTime += 1 / FPS;
+    document.getElementById('timePlayedDiv').innerHTML = `Time Played: ${formatTime(ingameTime)}`;
+}, 1000 / FPS);
+setInterval(() => {
+    saveProgress();
+}, 10000);
