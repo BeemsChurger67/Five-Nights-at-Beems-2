@@ -367,7 +367,9 @@ function updateMenu() {
     cnCtx.fillText("+1 All", 1615, 335);
     if (collide(cnMouse.x,cnMouse.y,1,1,1600,200,300,100) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,1600,200,300,100)) {
         for (let i = 0; i<characters.length; i++) {
-            customNightDifficulty[i] += 0.1;
+            if (customNightDifficulty[i] < 3.5) {
+                customNightDifficulty[i] += 0.1
+            }
         }
     }
     cnCtx.fillStyle = "black";; // start night
