@@ -109,7 +109,7 @@ button {
 }
 #settings {
     position: fixed;
-    font-family: "FnafFont";
+    font-family: "Arial";
     background-image: url('assets/nightSelectorStatic.gif');
     padding: 20px 20px;
     color: rgb(255, 255, 255);

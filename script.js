@@ -205,6 +205,18 @@ fpsInput.addEventListener('input', (e) => {
     fpsDisplay.innerText = `FPS: ${fpsInput.value}`;
     FPS = fpsInput.value;
 });
+let toggleMusicInput = document.getElementById("toggleMusic");
+let musicToggle = true;
+toggleMusicInput.addEventListener('input', (e) => {
+    musicToggle = toggleMusicInput.checked;
+    if (!musicToggle) {
+        menuMusic.volume = 0;
+        challenge1Theme.volume = 0;
+    } else {
+        menuMusic.volume = 0.5;
+        challenge1Theme.volume = 0.5;
+    }
+});
 window.addEventListener('resize', function() {
     windowSize = [window.innerWidth, window.innerHeight];
     document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
@@ -316,7 +328,7 @@ function thankYou() {
 }
 function updateMenu() {
     menuMusic.play();
-    if(menuMusic.volume < 0.50) {
+    if(menuMusic.volume < 0.50 && musicToggle) {
         menuMusic.volume+= 0.01;
     }
     staticDelay--;
