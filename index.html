@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="titleScreen">
-        <button id="cheatButton" style="font-size: 0.25vw;">cheats</button>
+        <button id="cheatButton" style="font-size: 0.25vw;" onclick="cheatsFunc();">cheats</button>
         <div id="menuButtons">
             <button id="nightsButton" onclick="nightSelectorOpen()">Nights</button>
             <button id="settingsButton" onclick="settingsOpen()">Settings</button>
@@ -48,9 +48,9 @@
         <canvas id="customNight" width="1920" height="1080"></canvas>
         <div id="customNightChallenges">
             <button id="challenge0" style="font-size: 1.2vw;" onclick="challengesSelect(0)">10/25</button>
-            <button id="challenge1" style="font-size: 2.3vw;" onclick="challengesSelect(1)">BEEMATHON</button>
             <button id="challenge2" style="font-size: 1.2vw;" onclick="challengesSelect(2)">Meows Attack</button>
-            <button id="challenge3" style="font-size: 1.2vw;" onclick="challengesSelect(3)">Camamask</button>
+            <button id="challenge3" style="font-size: 1.2vw;" onclick="challengesSelect(3)">Camamask</button><br>
+            <button id="challenge1" style="font-size: 2.3vw;" onclick="challengesSelect(1)">BEEMATHON</button>
         </div>
         <div id="thankYous">
             <h1>thank you for playing FNaB2</h1>

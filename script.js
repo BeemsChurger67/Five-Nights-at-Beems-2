@@ -152,6 +152,7 @@ let customNight = false;
 let night6Completed = false;
 let night6Completed2 = false;
 let firstCharacterTick = false;
+let completedPreviousNight = 1;
 characters = []
 let ingameCharacters = [];
 let customNightImages = [
@@ -190,6 +191,7 @@ let customNightLength = 270;
 let customNightPower = 100;
 let effectChallengesActive = [false,false];
 let customNightDifficulty = [0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9];
+let winTick = true;
 document.body.style.backgroundSize = `${windowSize[0]}px ${windowSize[1]}px`;
 document.body.style.backgroundImage = "url('assets/mainMenuNormalStatic.gif')";
 menuMusic.loop = true;
@@ -446,7 +448,9 @@ function updateMenu() {
         cnCtx.font = "30px Arial";
         cnCtx.fillText("▲",298 + i*305 - customNightA[0],245 + customNightA[1]+30);
         if (collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],245 + customNightA[1],25,40) && frameClick && inMenus[3] || customNightClickSpeed[0] < 0 && click && inMenus[3] && collide(cnMouse.x,cnMouse.y,1,1,300 + i*305 - customNightA[0],245 + customNightA[1],25,40)) {
-            customNightDifficulty[i] += 0.1;
+            if (customNightDifficulty[i] < 3.5) {
+                customNightDifficulty[i] += 0.1
+            }
         }
     }
     if (night6Completed && !night6Completed2) {
@@ -455,7 +459,34 @@ function updateMenu() {
     }
     frameClick = false;
 }
+function nextNightUnlock(nightCompleted) {
+    const n = Number(nightCompleted);
+    if (!Number.isInteger(n)) return;
+
+    if (n === 6) {
+        night6Completed = true;
+        const btn = document.getElementById("customNightButton");
+        if (btn) btn.style.setProperty('display', 'block', 'important');
+        saveProgress();
+        return;
+    }
+
+    if (n === completedPreviousNight) {
+        completedPreviousNight += 1;
+        const el = document.getElementById(`night${completedPreviousNight}`);
+        if (el) {
+            el.style.setProperty('display', 'block', 'important');
+            el.disabled = false;
+        } else {
+            console.warn('nextNightUnlock: element not found', `night${completedPreviousNight}`);
+        }
+        applyProgressToUI();
+        saveProgress();
+        console.log(`Unlocked night${completedPreviousNight}`);
+    }
+}
 function selectNight(nightSelected) {
+    winTick = true;
     menuMusic.volume = 0;
     document.getElementById('gameCanvas').style.display = 'block';
     document.getElementById('titleScreen').style.display = 'none';
@@ -469,7 +500,7 @@ function selectNight(nightSelected) {
     clearInterval(menuInterval);
     inGame = true;
     power = 100;
-    nightTimer = [0,270*FPS];
+    nightTimer = [0,270*FPS]; // dgafsafdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsafsddddddddddddddddfadsdsdsdsdsdsdsdsdsdsdsdsdsadfsedfasasasasasasasasasasasasas
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
@@ -531,6 +562,7 @@ function challengesSelect(challengeId) {
 }
 let a = 0;
 function startCustomNight() {
+    winTick = true;
     customNight = true;
     menuMusic.volume = 0;
     document.getElementById('gameCanvas').style.display = 'block';
@@ -651,8 +683,60 @@ function updateFPS() {
 
     return fpsDisplayInGame;
 }
+function cheatsFunc() {
+    for (let i = 0; i<7; i++) {
+        nextNightUnlock(i);
+    }
+}
+function saveProgress() {
+    const data = {
+        completedPreviousNight,
+        night6Completed,
+        night6Completed2
+    };
+    try {
+        localStorage.setItem('fnaf2_progress', JSON.stringify(data));
+    } catch (e) {
+        console.warn('saveProgress failed', e);
+    }
+}
+function applyProgressToUI() {
+    // show/hide night buttons based on completedPreviousNight
+    document.querySelectorAll('#nightSelector button').forEach(btn => {
+        const n = parseInt(btn.id.replace('night',''), 10);
+        if (!Number.isInteger(n)) return;
+        if (n <= completedPreviousNight) {
+            btn.style.setProperty('display', 'block', 'important');
+            btn.disabled = false;
+        } else {
+            btn.style.setProperty('display', 'none', 'important');
+            btn.disabled = true;
+        }
+    });
+    const customBtn = document.getElementById('customNightButton');
+    if (customBtn) {
+        if (completedPreviousNight >= 6 || night6Completed) {
+            customBtn.style.setProperty('display', 'block', 'important');
+        } else {
+            customBtn.style.setProperty('display', 'none', 'important');
+        }
+    }
+}
+
+function loadProgress() {
+    try {
+        const raw = localStorage.getItem('fnaf2_progress');
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (typeof data.completedPreviousNight === 'number') completedPreviousNight = data.completedPreviousNight;
+        night6Completed = !!data.night6Completed;
+        night6Completed2 = !!data.night6Completed2;
+        applyProgressToUI();
+    } catch (e) {
+        console.warn('loadProgress failed', e);
+    }
+}
 function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    console.log(ingameCharacters);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (effectChallengesActive[0]) {ctx.filter = 'grayscale(200%) contrast(500%) saturate(200%)';}
     if (effectChallengesActive[1]) {ctx.filter = 'sepia(1) hue-rotate(-50deg) contrast(500%) saturate(500%)';}
@@ -1068,9 +1152,6 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         if (blackBgTransparency[0] < 0.01 && bellSoundAnimationFrame[0] > 0.01) {
             if (bellSoundAnimationFrame[2] == false) {
                 bellSound.play();
-                if (night == 6) {
-                    night6Completed = true;
-                }
                 bellSoundAnimationFrame[2] = true;
             }
             bellSoundAnimationFrame[1]++;
@@ -1142,6 +1223,14 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 blackBgTransparency[0]+=0.01;
                 blackBgTransparency[1] = 0;
             }
+        }
+        if (winTick) {
+            if (night == 6) {
+                night6Completed = true;
+            }
+            nextNightUnlock(night);
+            console.log(`Night ${night} completed.`);
+            winTick = false;
         }
         ctx.fillStyle = "black";
         ctx.globalAlpha = blackBgTransparency[0];
@@ -1271,6 +1360,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
 function updateLoad() {
     loadInTimer--;
     if (loadInTimer < 0) {
+        loadProgress();
         menuInterval = setInterval(updateMenu, 1000/60);
         clearInterval(loadInterval);
     }

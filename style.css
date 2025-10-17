@@ -89,7 +89,16 @@ button {
     width: 12vw;
     font-size: 1.5vw;
 }
+#challenge0 {
+    color: rgb(255, 255, 255);
+    transition: ease 0.3s;
+}
+#challenge0:hover {
+    background-image: url("assets/staticInvert.gif");
+    color: rgb(0, 0, 0);
+}
 #challenge1 {
+    /* display: none;*/
     font-family: "intenseFont", sans-serif;
     color: red;
     transition: ease 0.3s;
@@ -151,6 +160,12 @@ button {
     transition: top 1s cubic-bezier(0.1,1,0.1,1);
     text-align: center;
 }
+#thankYous.close {
+    top: -500px;
+}
+#thankYous.active {
+    top: 50%
+}
 #settings.active {
     top: 50%
 }
@@ -194,8 +209,14 @@ button {
 #nightSelector.close {
     left: -500px; /* Moves back above the screen */
 }
+#night2, #night3, #night4, #night5, #night6 {
+    display: none !important;
+}
 #night6 {
     color: red;
+}
+#customNightButton {
+    display: none;
 }
 #cheatButton {
     position: fixed;
