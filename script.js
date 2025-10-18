@@ -1105,7 +1105,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 if (ingameCharacters[i][1] < 0) {
                     ingameCharacters[i][2]-= 1 * ingameCharacters[i][3];
                     if (ingameCharacters[i][7] < 0.99) {ingameCharacters[i][7] += 0.01;}
-                    if (!powerConsumers[2] && !powerConsumers[0]) {
+                    if (!powerConsumers[2]) {
                         ctx.globalAlpha = ingameCharacters[i][7];
                         ctx.drawImage(noahCharacter,-cameraX/3 + ingameCharacters[i][5], 600, 200, 400);
                         ctx.globalAlpha = 1;
