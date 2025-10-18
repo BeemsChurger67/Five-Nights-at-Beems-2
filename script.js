@@ -157,7 +157,7 @@ let completedPreviousNight = 1;
 let totalTimePlayed = 0;
 let ingameTime = 0;
 let deathCounter = 0;
-characters = []
+let characters = []
 let ingameCharacters = [];
 let customNightImages = [
     beemsCharacter,
@@ -210,6 +210,7 @@ fpsInput.addEventListener('input', (e) => {
     fpsDisplay.innerText = `FPS: ${fpsInput.value}`;
     FPS = fpsInput.value;
 });
+let previousAttemptTime = 0;
 let toggleMusicInput = document.getElementById("toggleMusic");
 let musicToggle = true;
 toggleMusicInput.addEventListener('input', (e) => {
@@ -352,7 +353,12 @@ function updateMenu() {
     } else {
         customNightClickSpeed[0] = 0.5*FPS;
     }
+
     cnCtx.clearRect(0, 0, cnCanvas.width, cnCanvas.height);
+    cnCtx.font = "80px FnafFont";
+    cnCtx.fillStyle = "white";
+    cnCtx.fillText(`Previous Attempt: ${(nightTimer[0]/nightTimer[1]*6).toFixed(2)}AM`, 0, 950);
+
     cnCtx.fillStyle = "black";; // -1 all
     cnCtx.fillRect(1600,50,300,100);
     cnCtx.fillStyle = "white";
@@ -1303,6 +1309,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         if (deathTick) {
             deathCounter++;
             document.getElementById('deathCounterDiv').innerHTML = `Deaths: ${deathCounter}`;
+            previousAttemptTime = ingameTime;
             saveProgress();
             deathTick = false;
             inGame = false;
