@@ -1399,7 +1399,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         }
         if(deathBy == "glitch") {
             deathAnimationTimer++;
-            if (deathAnimationTimer >= 3*FPS) { 
+            if (deathAnimationTimer >= 1.5*FPS) { 
                 backMainMenu();
             } else {
                 ctx.drawImage(glitchCharacter,0,0,canvas.width,canvas.height);
