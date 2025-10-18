@@ -184,7 +184,7 @@ const eachNightDifficulty = [
     [5.0, 5.0, 2.6, 2.6, 2.2, 2.2, 1.8, 1.8, 1.4, 1.4], // night 6
 ]
 let challenges = [
-    [[3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5],360, 150], // 10/25
+    [[3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5],360, 175], // 10/25
     [[4.0, 4.0, 4.0, 4.0, 101, 4.0, 4.0, 4.0, 101, 4.0],600, 300], // beemathon
     [[2.0, 2.0, 2.0, 2.0, 0.9, 2.0, 0.9, 2.0, 0.9, 0.9],200, 100], // meows attack
     [[0.9, 0.9, 0.9, 5, 101, 11, 0.9, 0.9, 101, 0.9],120, 100] // camamask
@@ -355,7 +355,7 @@ function updateMenu() {
     }
 
     cnCtx.clearRect(0, 0, cnCanvas.width, cnCanvas.height);
-    cnCtx.font = "80px FnafFont";
+    cnCtx.font = "40px FnafFont";
     cnCtx.fillStyle = "white";
     cnCtx.fillText(`Previous Attempt: ${(nightTimer[0]/nightTimer[1]*6).toFixed(2)}AM`, 0, 950);
 
