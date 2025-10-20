@@ -232,24 +232,6 @@ window.addEventListener('keydown', (e) => {
     singleTapKeys[e.code] = true;
     console.log(e.code);
 })
-function isMobile() {
-  return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
-}
-function mobileFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-    }
-}
-window.addEventListener('touchstart', (e) => {
-    frameClick = true;
-    const touch = e.touches[0]; // first finger
-    mouse.x = touch.clientX;
-    mouse.y = touch.clientY;
-});
 window.addEventListener("mousedown", (e) => {
     frameClick = true;
     click = true
@@ -532,9 +514,6 @@ function nextNightUnlock(nightCompleted) {
 }
 function selectNight(nightSelected) {
     mobileInGame = false;
-    if (isMobile) {
-        mobileInGame = true;
-    }
     deathTick = true;
     winTick = true;
     menuMusic.volume = 0;
@@ -613,9 +592,6 @@ function challengesSelect(challengeId) {
 let a = 0;
 function startCustomNight() {
     mobileInGame = false;
-    if (isMobile) {
-        mobileInGame = true;
-    }
     deathTick = true;
     winTick = true;
     customNight = true;
@@ -860,10 +836,6 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 maskSound.play()
             }
         }
-        if (mobileInGame) {
-            
-        }
-        
         if (mask) {
             if (maskAnimationFrame < 1*FPS) {
                 maskAnimationFrame+= 1000/FPS;
