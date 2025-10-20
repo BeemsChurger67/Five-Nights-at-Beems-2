@@ -232,6 +232,24 @@ window.addEventListener('keydown', (e) => {
     singleTapKeys[e.code] = true;
     console.log(e.code);
 })
+function isMobile() {
+  return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+}
+function mobileFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+window.addEventListener('touchstart', (e) => {
+    frameClick = true;
+    const touch = e.touches[0]; // first finger
+    mouse.x = touch.clientX;
+    mouse.y = touch.clientY;
+});
 window.addEventListener("mousedown", (e) => {
     frameClick = true;
     click = true
@@ -255,8 +273,10 @@ cnCanvas.addEventListener('mousemove', function(event) {
     cnMouse.x = (event.clientX - rect.left) * (cnCanvas.width / rect.width);
     cnMouse.y = (event.clientY - rect.top) * (cnCanvas.height / rect.height);
 })
+
+let mobileInGame = false;
 function resetCharacters() {
-    characters = [ // 44 opacity
+    characters = [ // spawnTimer | killTimer | difficulty | leaveTimer | other
         ["beems", Math.random() * 20*FPS + 10*FPS, 6*FPS, 1, 0.75*FPS,0], // animation
         ["jolly beems", Math.random() * 20*FPS + 6*FPS, 10*FPS, 1, 0.75*FPS,0], // animation
         ["bryan", Math.random() * 20*FPS + 10*FPS, 7*FPS, 1, 1*FPS,0], // animation
@@ -267,7 +287,7 @@ function resetCharacters() {
         ["noah", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.25*FPS,401,false,0], // x | side | animation
         ["glitch", Math.random() * 20*FPS + 10*FPS,10*FPS,1,0, Math.round(Math.random()*2)], // cam
         ["serbian", Math.random() * 20*FPS + 10*FPS,8*FPS,1,0.75*FPS],
-    ]
+    ] // killtimers: beems 1.7 | jolly beems 2.8 | bryan 2.0 | jane 0.5 | bubzeee 10 | zennix ? | local 0.4 | noah 2.2 | glitch 10 | serbian 2.2
 }
 resetCharacters();
 function nightSelectorOpen() {
@@ -511,6 +531,10 @@ function nextNightUnlock(nightCompleted) {
     }
 }
 function selectNight(nightSelected) {
+    mobileInGame = false;
+    if (isMobile) {
+        mobileInGame = true;
+    }
     deathTick = true;
     winTick = true;
     menuMusic.volume = 0;
@@ -588,6 +612,10 @@ function challengesSelect(challengeId) {
 }
 let a = 0;
 function startCustomNight() {
+    mobileInGame = false;
+    if (isMobile) {
+        mobileInGame = true;
+    }
     deathTick = true;
     winTick = true;
     customNight = true;
@@ -832,6 +860,10 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 maskSound.play()
             }
         }
+        if (mobileInGame) {
+            
+        }
+        
         if (mask) {
             if (maskAnimationFrame < 1*FPS) {
                 maskAnimationFrame+= 1000/FPS;
