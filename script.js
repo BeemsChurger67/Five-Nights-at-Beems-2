@@ -132,7 +132,8 @@ let winState = false;
 let deathState = false;
 let deathBy = "";
 let deathAnimationTimer = 0;
-let blackBgTransparency = [0,0];
+let blackBgTransparency = 0;
+let fadeDone = false;
 let bellSoundAnimationFrame = [1,0]; // opacity | time
 let titleTime = 0;
 let cameraX = 0;
@@ -335,6 +336,7 @@ function thankYou() {
     inMenus[5] = !inMenus[5];
 }
 function updateMenu() {
+    inGame = false;
     menuMusic.play();
     if(menuMusic.volume < 0.50 && musicToggle) {
         menuMusic.volume+= 0.01;
@@ -513,6 +515,7 @@ function nextNightUnlock(nightCompleted) {
     }
 }
 function selectNight(nightSelected) {
+    fadeDone = false;
     mobileInGame = false;
     deathTick = true;
     winTick = true;
@@ -533,7 +536,7 @@ function selectNight(nightSelected) {
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
-    blackBgTransparency[0] = 1;
+    blackBgTransparency = 1;
     titleTime = 0;
     for (let i = 0; i<powerConsumers.length; i++) {
         powerConsumers[i] = false;
@@ -591,7 +594,7 @@ function challengesSelect(challengeId) {
 }
 let a = 0;
 function startCustomNight() {
-    mobileInGame = false;
+    fadeDone = false;
     deathTick = true;
     winTick = true;
     customNight = true;
@@ -613,7 +616,7 @@ function startCustomNight() {
     mask = false;
     maskAnimationEnabling = false;
     winState = false;
-    blackBgTransparency[0] = 1;
+    blackBgTransparency = 1;
     titleTime = 0;
     for (let i = 0; i<powerConsumers.length; i++) {
         powerConsumers[i] = false;
@@ -847,6 +850,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                 maskAnimationFrame-= 1000/FPS;
             }
         }
+        console.log(maskAnimationFrame);
         for (let i = 0; i<powerConsumers.length; i++) {
             if (powerConsumers[i] == true) {
                 power -= 0.72/FPS;
@@ -979,7 +983,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                         ctx.drawImage(bryanCharacter,-cameraX/3 + 1330, 457, 135, 270);
                         ctx.globalAlpha = 1;
                     }
-                    if (powerConsumers[3] && distance(-cameraX/3 + 1330+67, 477+135, mouse.x, mouse.y) < 200) {
+                    if (powerConsumers[3] && distance(-cameraX/3 + 1330+67, 477+135, mouse.x, mouse.y) < 200 && !powerConsumers[2]) {
                         ingameCharacters[i][4]--;
                         ingameCharacters[i][2] += 120/FPS * ingameCharacters[i][3];
                     }
@@ -1117,7 +1121,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                     if (ingameCharacters[i][5] > 2200) {ingameCharacters[i][6] = true}
                     if (ingameCharacters[i][5] < 400) {ingameCharacters[i][6] = false}
                     if (ingameCharacters[i][6]) {ingameCharacters[i][5] -= 18*120/FPS} else {ingameCharacters[i][5] += 18*120/FPS}
-                    if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5]+100, 600+200, mouse.x, mouse.y) < 300) {
+                    if (powerConsumers[3] && distance(-cameraX/3 + ingameCharacters[i][5]+100, 600+200, mouse.x, mouse.y) < 300 && !powerConsumers[2]) {
                         ingameCharacters[i][4]--;
                     }
                     if (ingameCharacters[i][4] < 0) {
@@ -1166,7 +1170,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
                     }
                     if(ingameCharacters[i][2] < 0) {
                         deathState = true;
-                        deathBy = ingameCharacters[i][0]
+                        deathBy = ingameCharacters[i][0];
                     }
                 }
             }
@@ -1203,14 +1207,8 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
         ctx.drawImage(powerOutageDarkness,0,0,canvas.width,canvas.height);
     }
     if (!winState && !deathState) {
-        blackBgTransparency[1]++;
-        if (blackBgTransparency[1] > 3) {
-            if (blackBgTransparency[0] > 0.01) {
-                blackBgTransparency[0] -= 1.5/FPS;
-            }
-            blackBgTransparency[1] = 0
-        }
-        if (blackBgTransparency[0] < 0.01 && bellSoundAnimationFrame[0] > 0.01) {
+        blackBgTransparency-= 0.25/FPS;
+        if (blackBgTransparency < 0.01 && bellSoundAnimationFrame[0] > 0.01) {
             if (bellSoundAnimationFrame[2] == false) {
                 bellSound.play();
                 bellSoundAnimationFrame[2] = true;
@@ -1231,9 +1229,9 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
             }
             ctx.globalAlpha = 1.0;
         }
-        if (blackBgTransparency[0] > 0) {
+        if (blackBgTransparency > 0) {
             ctx.fillStyle = "black"; 
-            ctx.globalAlpha = blackBgTransparency[0];
+            ctx.globalAlpha = blackBgTransparency;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.globalAlpha = 1.0;
         }
@@ -1266,8 +1264,8 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
     ctx.fillStyle = "white";
     ctx.font = "bold 75px FnafFont";
     updateFPS();
-    ctx.fillText(`Power: ${power.toFixed(1)}%`, 30, 1000);
-    ctx.fillText(`FPS: ${(fpsDisplayInGame/1.05).toFixed(0)}`, 30, 925);
+    ctx.fillText(`Power: ${power.toFixed(1)}%`, 30, 1012);
+    ctx.fillText(`FPS: ${(fpsDisplayInGame/1.05).toFixed(0)}/${FPS}`, 30, 925);
     if (effectChallengesActive[0] || effectChallengesActive[1]) {
         ctx.fillText(`${(nightTimer[0]/nightTimer[1]*6).toFixed(2)}AM`, 30, 1100);
     } else {
@@ -1275,15 +1273,15 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
     }
     frameClick = false;
     if (nightTimer[0] >= nightTimer[1]) {
+        if (!fadeDone) {
+            blackBgTransparency = 0;
+            fadeDone = true;
+        }
         winState = true;
         resetSounds();
         sixAM.play();
-        if (blackBgTransparency[0] < 1) {
-            blackBgTransparency[1]++;
-            if (blackBgTransparency[1] >= 0.1*FPS) {
-                blackBgTransparency[0]+=0.01;
-                blackBgTransparency[1] = 0;
-            }
+        if (blackBgTransparency < 1) {
+            blackBgTransparency += 0.5/FPS;
         }
         if (winTick) {
             if (night == 6) {
@@ -1294,7 +1292,7 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
             winTick = false;
         }
         ctx.fillStyle = "black";
-        ctx.globalAlpha = blackBgTransparency[0];
+        ctx.globalAlpha = blackBgTransparency;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1.0;
         ctx.font = "bold 150px FnafFont"
@@ -1314,9 +1312,9 @@ function updateGame() { // ENTIRE INGAME |||||||||||||||||||||||||||||||||||||||
             deathCounter++;
             document.getElementById('deathCounterDiv').innerHTML = `Deaths: ${deathCounter}`;
             previousAttemptTime = ingameTime;
+            inGame = false;
             saveProgress();
             deathTick = false;
-            inGame = false;
         }
         if(deathBy == "beems") {
             deathAnimationTimer++;
